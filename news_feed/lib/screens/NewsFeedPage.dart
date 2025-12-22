@@ -13,12 +13,12 @@ class NewsFeedPage extends StatelessWidget {
   // The list of categories remains the same (7 categories)
   final Map<String, String> sectionTitles = const {
     'general': 'Latest Headlines',
-    // 'world': 'World',
-    // 'nation': 'Nation',
-    // 'business': 'Business',
-    // 'technology': 'Technology',
-    // 'entertainment': 'Entertainment',
-    // 'sports': 'Sports',
+    'world': 'World',
+    'nation': 'Nation',
+    'business': 'Business',
+    'technology': 'Technology',
+    'entertainment': 'Entertainment',
+    'sports': 'Sports',
   };
 
   @override
