@@ -29,14 +29,20 @@ class NewsFeedPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+          children: [
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
             //HERO SECTION
             FutureBuilder<NewsItem?>(
               future: fetchHeroArticle(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container(
-                    height: 700,
+                    height: MediaQuery.of(context).size.height > 800 ? 500 : MediaQuery.of(context).size.height * 0.5,
                     color: Colors.grey[200],
                     margin: const EdgeInsets.symmetric(
                       horizontal: 16.0,
@@ -82,8 +88,12 @@ class NewsFeedPage extends StatelessWidget {
             }).toList(),
 
             const SizedBox(height: 40),
-            FooterWidget(),
           ],
+        ),
+      ),
+      ),
+      const FooterWidget(),
+      ],
         ),
       ),
     );

@@ -75,8 +75,14 @@ class _CategoryNewsPageState extends State<CategoryNewsPage> {
             )
           : SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1200),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
                     child: Text(
@@ -95,13 +101,9 @@ class _CategoryNewsPageState extends State<CategoryNewsPage> {
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: MediaQuery.of(context).size.width > 900
-                            ? 3
-                            : MediaQuery.of(context).size.width > 600
-                            ? 2
-                            : 1,
-                        childAspectRatio: 2.0,
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 450,
+                        childAspectRatio: MediaQuery.of(context).size.width < 600 ? 1.2 : 1.6,
                         crossAxisSpacing: 27,
                         mainAxisSpacing: 30,
                       ),
@@ -113,7 +115,10 @@ class _CategoryNewsPageState extends State<CategoryNewsPage> {
                   ),
 
                   const SizedBox(height: 70),
-
+                ],
+                      ),
+                    ),
+                  ),
                   const FooterWidget(),
                 ],
               ),

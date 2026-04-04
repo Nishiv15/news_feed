@@ -58,7 +58,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 900;
+    final isDesktop = MediaQuery.of(context).size.width > 950;
     final activeCategory = currentCategory ?? 'Home';
 
     return AppBar(
@@ -84,10 +84,13 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
 
+      centerTitle: isDesktop,
       title: isDesktop
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: categoryMap.keys.map((category) {
+          ? SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: categoryMap.keys.map((category) {
                 final isSelected = category == activeCategory;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -115,6 +118,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 );
               }).toList(),
+              ),
             )
           : null, 
       actions: <Widget>[
