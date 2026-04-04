@@ -1,16 +1,13 @@
-// lib/navbar_widget.dart
-
 import 'package:flutter/material.dart';
-import '../screens/CategoryNewsPage.dart'; // Import the new generic page
-import '../screens/NewsFeedPage.dart'; // Import NewsFeedPage (assuming it's here for navigation)
+import '../screens/CategoryNewsPage.dart'; 
+import '../screens/NewsFeedPage.dart'; 
 
-// This map holds the display name and the corresponding GNews API category key.
-// 'Home' maps to 'general' primarily for consistent highlighting, but its navigation is handled separately.
+
 const Map<String, String> categoryMap = {
   'Home': 'general',
   'World': 'world',
   'Politics':
-      'nation', // GNews uses 'nation' for US/National news, which works for 'Politics' context
+      'nation', 
   'Business': 'business',
   'Technology': 'technology',
   'Sports': 'sports',
@@ -18,19 +15,13 @@ const Map<String, String> categoryMap = {
 };
 
 class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
-  // New optional parameter to indicate the currently active category (e.g., 'World', 'Home')
   final String? currentCategory;
 
   const NewsFeedNavBar({super.key, this.currentCategory});
 
-  // Handles navigation for all categories
   void _handleCategoryTap(BuildContext context, String category) {
-    // --- SPECIAL CASE: HOME ---
     if (category == 'Home') {
-      // This correctly returns to the multi-section NewsFeedPage,
-      // avoiding navigation to a single-category view.
       Navigator.popUntil(context, (route) => route.isFirst);
-      // If we are already on the home page, the line above does nothing, so we ensure a navigation if needed.
       if (ModalRoute.of(context)?.settings.name != null &&
           ModalRoute.of(context)?.settings.name != '/') {
         Navigator.pushAndRemoveUntil(
@@ -40,9 +31,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         );
       }
     }
-    // --- STANDARD CATEGORIES ---
     else {
-      // Navigates to the single CategoryNewsPage for the selected category.
       final apiCategory = categoryMap[category]!;
       Navigator.push(
         context,
@@ -56,17 +45,13 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Determine if we are on a large screen for desktop layout
     final isDesktop = MediaQuery.of(context).size.width > 900;
-
-    // Determine the category to highlight. Default to 'Home' if none is specified.
     final activeCategory = currentCategory ?? 'Home';
 
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 1,
 
-      // --- Leading Widget (NewsDaily Logo) ---
       leadingWidth: isDesktop ? 180 : 120,
       leading: Padding(
         padding: EdgeInsets.only(left: isDesktop ? 20.0 : 10.0),
@@ -75,7 +60,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
           child: const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'NewsDaily',
+              'NewsFeed',
               style: TextStyle(
                 color: Color(0xFF1A1A2E),
                 fontSize: 21,
@@ -86,7 +71,6 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
 
-      // --- Title Widget (The main navigation links for Desktop) ---
       title: isDesktop
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -119,10 +103,8 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                 );
               }).toList(),
             )
-          : null, // Title is null on mobile, letting actions handle navigation
-      // --- Actions (Search Icon and Mobile Menu) ---
+          : null, 
       actions: <Widget>[
-        // If not desktop, show all categories in a dropdown menu
         if (!isDesktop)
           PopupMenuButton<String>(
             onSelected: (String result) => _handleCategoryTap(context, result),
@@ -148,10 +130,9 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
           ),
 
         IconButton(
-          icon: const Icon(Icons.search, color: Color(0xFF1A1A2E)),
+          icon: const Icon(Icons.person, color: Color(0xFF1A1A2E)),
           onPressed: () {
-            // Placeholder for search functionality
-            debugPrint('Search button pressed');
+            debugPrint('Person button pressed');
           },
         ),
         const SizedBox(width: 10),

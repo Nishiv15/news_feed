@@ -3,8 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import './screens/NewsFeedPage.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Required for FlutterConfig or other async calls
-  await dotenv.load(fileName: ".env"); // Load the .env file
+  WidgetsFlutterBinding.ensureInitialized(); 
+  await dotenv.load(fileName: ".env"); 
   runApp(const MyApp());
 }
 

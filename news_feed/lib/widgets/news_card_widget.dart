@@ -1,5 +1,3 @@
-// lib/news_card_widget.dart
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/news_model.dart';
@@ -14,7 +12,6 @@ class NewsCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        // Open the article URL in a browser
         final url = Uri.parse(article.url);
         if (await canLaunchUrl(url)) {
           await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -41,7 +38,6 @@ class NewsCardWidget extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Image Display with Robust Error Handling ---
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12.0),
@@ -53,7 +49,6 @@ class NewsCardWidget extends StatelessWidget {
                 child: Image.network(
                   article.imageUrl,
                   fit: BoxFit.cover,
-                  // START: Image Error Handling
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[200],
@@ -62,7 +57,6 @@ class NewsCardWidget extends StatelessWidget {
                       ),
                     );
                   },
-                  // END: Image Error Handling
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
@@ -76,7 +70,6 @@ class NewsCardWidget extends StatelessWidget {
               ),
             ),
 
-            // --- Text Content ---
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(

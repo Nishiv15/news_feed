@@ -15,12 +15,10 @@ class HeroSectionWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: InkWell(
         onTap: () async {
-          // Open the article URL in a browser
           final url = Uri.parse(newsItem.url);
           if (await canLaunchUrl(url)) {
             await launchUrl(url, mode: LaunchMode.externalApplication);
           } else {
-            // Handle error (e.g., show a snackbar)
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Could not open article link: ${newsItem.url}')),
             );
@@ -40,7 +38,6 @@ class HeroSectionWidget extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // --- Image Display with Robust Error Handling ---
               ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
                 child: Image.network(
@@ -48,7 +45,6 @@ class HeroSectionWidget extends StatelessWidget {
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
-                  // START: Image Error Handling
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey[200],
@@ -57,7 +53,6 @@ class HeroSectionWidget extends StatelessWidget {
                       ),
                     );
                   },
-                  // END: Image Error Handling
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
@@ -70,7 +65,6 @@ class HeroSectionWidget extends StatelessWidget {
                 ),
               ),
 
-              // --- Gradient Overlay for Text Readability ---
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
@@ -86,7 +80,6 @@ class HeroSectionWidget extends StatelessWidget {
                 ),
               ),
 
-              // --- Text Content ---
               Positioned(
                 bottom: 20,
                 left: 20,
