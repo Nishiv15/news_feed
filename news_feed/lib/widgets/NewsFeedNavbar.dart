@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 import '../screens/CategoryNewsPage.dart'; 
 import '../screens/NewsFeedPage.dart'; 
+import '../models/news_model.dart';
 
+const Map<String, String> countryMap = {
+  'Argentina': 'ar', 'Australia': 'au', 'Bangladesh': 'bd', 'Brazil': 'br', 
+  'Canada': 'ca', 'China': 'cn', 'Colombia': 'co', 'Egypt': 'eg', 
+  'France': 'fr', 'Germany': 'de', 'Greece': 'gr', 'Hong Kong': 'hk', 
+  'India': 'in', 'Indonesia': 'id', 'Ireland': 'ie', 'Israel': 'il', 
+  'Italy': 'it', 'Japan': 'jp', 'Malaysia': 'my', 'Mexico': 'mx', 
+  'Netherlands': 'nl', 'Norway': 'no', 'Pakistan': 'pk', 'Peru': 'pe', 
+  'Philippines': 'ph', 'Portugal': 'pt', 'Romania': 'ro', 'Russia': 'ru', 
+  'Singapore': 'sg', 'Spain': 'es', 'Sweden': 'se', 'Switzerland': 'ch', 
+  'Taiwan': 'tw', 'Turkey': 'tr', 'Ukraine': 'ua', 'United Kingdom': 'gb', 
+  'United States': 'us',
+};
 
 const Map<String, String> categoryMap = {
   'Home': 'general',
@@ -129,6 +142,46 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
             },
           ),
 
+        DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: globalCountry,
+            icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1A1A2E)),
+            dropdownColor: Colors.white,
+            onChanged: (String? newValue) {
+              if (newValue != null && newValue != globalCountry) {
+                globalCountry = newValue;
+                // Re-push NewsFeedPage to force rebuild and re-fetch with new country
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NewsFeedPage()),
+                  (Route<dynamic> route) => false,
+                );
+              }
+            },
+            selectedItemBuilder: (BuildContext context) {
+              return countryMap.values.map<Widget>((String value) {
+                return Center(
+                  child: Text(
+                    value.toUpperCase(),
+                    style: const TextStyle(
+                      color: Color(0xFF1A1A2E),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }).toList();
+            },
+            items: countryMap.entries.map<DropdownMenuItem<String>>((entry) {
+              return DropdownMenuItem<String>(
+                value: entry.value,
+                child: Text(
+                  entry.key,
+                  style: const TextStyle(color: Color(0xFF1A1A2E)),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
         IconButton(
           icon: const Icon(Icons.person, color: Color(0xFF1A1A2E)),
           onPressed: () {

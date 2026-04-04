@@ -7,6 +7,8 @@ String apiKey = dotenv.env['apikey'] ?? '';
 String baseUrl = dotenv.env['baseurl'] ?? '';
 const int maxArticles = 10; 
 
+String globalCountry = 'us'; // Default country is US
+
 const String placeholderImageUrl =
     'https://placehold.co/600x400/CCCCCC/666666?text=Image+Unavailable';
 
@@ -64,7 +66,7 @@ class NewsItem {
 
 Future<NewsItem?> fetchHeroArticle() async {
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=general&lang=en&country=us&max=1&apikey=$apiKey',
+    '${baseUrl}top-headlines?category=general&lang=en&country=$globalCountry&max=1&apikey=$apiKey',
   );
 
   try {
@@ -96,7 +98,7 @@ Future<NewsItem?> fetchHeroArticle() async {
 
 Future<List<NewsItem>> fetchArticlesByCategory(String category) async {
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=$category&lang=en&country=us&max=$maxArticles&apikey=$apiKey',
+    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$maxArticles&apikey=$apiKey',
   );
 
   try {
@@ -135,7 +137,7 @@ Future<List<NewsItem>> fetchArticlesByCategory(String category) async {
 
 Future<List<NewsItem>> fetchCategory(String category, {int max = 10}) async {
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=$category&lang=en&country=us&max=$max&apikey=$apiKey',
+    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&apikey=$apiKey',
   );
 
   try {
