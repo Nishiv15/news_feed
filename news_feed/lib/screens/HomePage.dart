@@ -128,7 +128,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
             
-            // --- Feature Section 1 ---
+            // Feature Section 1
             _buildLargeFeatureSection(
               icon: Icons.flag,
               title: 'Global, Country-Wise News',
@@ -137,10 +137,12 @@ class HomePage extends StatelessWidget {
                   'news from the United States, India, the United Kingdom, and dozens of other '
                   'supported countries around the globe. Get the perspective you need, instantly.',
               imageLeft: true,
-              backgroundColor: const Color(0xFFD6EAF8), // Visible Sky Blue
+              backgroundColor: const Color(0xFFD6EAF8), 
             ),
             
-            // --- Feature Section 2 ---
+            const Divider(height: 1, thickness: 1, color: Colors.black54),
+            
+            // Feature Section 2
             _buildLargeFeatureSection(
               icon: Icons.category,
               title: 'Robust Category Filtering',
@@ -149,10 +151,12 @@ class HomePage extends StatelessWidget {
                   'Business and Technology to Entertainment and Sports. Deep dive into specialized '
                   'feeds designed perfectly to match your interests.',
               imageLeft: false,
-              backgroundColor: const Color(0xFFD5F5E3), // Visible Mint Green
+              backgroundColor: const Color(0xFFD6EAF8), 
             ),
             
-            // --- Feature Section 3 ---
+            const Divider(height: 1, thickness: 1, color: Colors.black54),
+
+            // Feature Section 3
             _buildLargeFeatureSection(
               icon: Icons.auto_awesome,
               title: 'Intelligent AI Summarization',
@@ -161,9 +165,9 @@ class HomePage extends StatelessWidget {
                   'Instantly generate crisp, accurate, and lightning-fast summaries of any headline '
                   'so you can grasp the core story in mere seconds without skipping a beat.',
               imageLeft: true,
-              backgroundColor: const Color(0xFFE8DAEF), // Visible Soft Lavender
+              backgroundColor: const Color(0xFFD6EAF8), 
             ),
-            // Re-using the minimal footer
+
             const FooterWidget(),
           ],
         ),
