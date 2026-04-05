@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/NewsFeedFooter.dart';
 import 'NewsFeedPage.dart';
+import 'LoginRegisterPage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -95,9 +96,10 @@ class HomePage extends StatelessWidget {
                           ),
                           OutlinedButton(
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Login/Signup functionality coming soon!'),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const LoginRegisterPage(),
                                 ),
                               );
                             },
@@ -313,9 +315,10 @@ class _HomeNavBar extends StatelessWidget implements PreferredSizeWidget {
       actions: <Widget>[
         TextButton(
           onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Login/Signup functionality coming soon!'),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const LoginRegisterPage(),
               ),
             );
           },
