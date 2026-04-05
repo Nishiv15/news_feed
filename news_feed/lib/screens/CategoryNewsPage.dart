@@ -101,9 +101,9 @@ class _CategoryNewsPageState extends State<CategoryNewsPage> {
                     child: GridView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                         maxCrossAxisExtent: 450,
-                        childAspectRatio: MediaQuery.of(context).size.width < 600 ? 1.2 : 1.6,
+                        mainAxisExtent: 320, // Forces constant height. Prevents cards crushing!
                         crossAxisSpacing: 27,
                         mainAxisSpacing: 30,
                       ),

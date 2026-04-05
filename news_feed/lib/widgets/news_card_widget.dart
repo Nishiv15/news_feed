@@ -44,8 +44,8 @@ class NewsCardWidget extends StatelessWidget {
                 topRight: Radius.circular(12.0),
               ),
               child: SizedBox(
-                height: 150,
-                width: 300,
+                height: 160,
+                width: double.infinity,
                 child: Image.network(
                   article.imageUrl,
                   fit: BoxFit.cover,
