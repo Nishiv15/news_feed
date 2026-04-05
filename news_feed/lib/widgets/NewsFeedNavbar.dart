@@ -178,9 +178,13 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
             items: countryMap.entries.map<DropdownMenuItem<String>>((entry) {
               return DropdownMenuItem<String>(
                 value: entry.value,
-                child: Text(
-                  entry.key,
-                  style: const TextStyle(color: Color(0xFF1A1A2E)),
+                child: Container(
+                  constraints: const BoxConstraints(minWidth: 150),
+                  child: Text(
+                    entry.key,
+                    softWrap: false,
+                    style: const TextStyle(color: Color(0xFF1A1A2E)),
+                  ),
                 ),
               );
             }).toList(),
