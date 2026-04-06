@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../screens/CategoryNewsPage.dart'; 
 import '../screens/NewsFeedPage.dart'; 
+import '../screens/HomePage.dart'; 
 import '../models/news_model.dart';
-
+import '../models/supabase_auth_service.dart';
 const Map<String, String> countryMap = {
   'Argentina': 'ar', 'Australia': 'au', 'Bangladesh': 'bd', 'Brazil': 'br', 
   'Canada': 'ca', 'China': 'cn', 'Colombia': 'co', 'Egypt': 'eg', 
@@ -190,11 +191,39 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
             }).toList(),
           ),
         ),
-        IconButton(
+        PopupMenuButton<String>(
           icon: const Icon(Icons.person, color: Color(0xFF1A1A2E)),
-          onPressed: () {
-            debugPrint('Person button pressed');
+          onSelected: (String result) async {
+            if (result == 'logout') {
+              await SupabaseAuthService.logoutUser();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomePage()),
+                  (route) => false,
+                );
+              }
+            } else if (result == 'profile') {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile coming soon!')));
+            } else if (result == 'likes') {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Likes coming soon!')));
+            }
           },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'profile',
+              child: Text('Profile'),
+            ),
+            const PopupMenuItem<String>(
+              value: 'likes',
+              child: Text('Likes'),
+            ),
+            const PopupMenuDivider(),
+            const PopupMenuItem<String>(
+              value: 'logout',
+              child: Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
         ),
         const SizedBox(width: 10),
       ],

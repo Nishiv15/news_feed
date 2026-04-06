@@ -57,4 +57,9 @@ class SupabaseAuthService {
       throw Exception('Login failed to return a valid user.');
     }
   }
+
+  /// Logs out the currently authenticated user
+  static Future<void> logoutUser() async {
+    await _supabase.auth.signOut();
+  }
 }
