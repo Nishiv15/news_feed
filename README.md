@@ -1,4 +1,4 @@
-# NewsFeed AI 📰✨
+# NewsFeed
 
 A beautiful, premium cross-platform Flutter application providing highly curated, real-time localized news articles powered by an intelligent AI integration. 
 
@@ -19,7 +19,7 @@ Built natively in Flutter, it acts as a globalized news hub that lets you instan
 
 - **Global Coverage Mapping**: Dynamically flip through 36 different global country metrics. Switch from United States headlines to Japanese tech news with a single dropdown modification.
 - **Categorical Segregation**: Smooth, modern navigation seamlessly partitions your feed into exact categories (World, Business, Politics, Entertainment, Technology, and Sports).
-- **Intelligent Right-Panel AI Summarizer**: By tapping the "Sparkle" icon positioned on every news card, a highly responsive right-side drawer slides flawlessly into view, utilizing **Google Generative AI (Gemini 1.5 Flash)** to read the article's descriptions and build localized, rapid-fire executive summaries so you get the news faster than ever.
+- **Intelligent Right-Panel AI Summarizer**: By tapping the "Sparkle" icon positioned on every news card, a highly responsive right-side drawer slides flawlessly into view, utilizing AI Models to read the article's descriptions and build localized, rapid-fire executive summaries so you get the news faster than ever.
 - **Secure Supabase Authentication**: Utilizes a hardened backend connection allowing users to natively register accounts. Upon registration, their localized `Country` preferences are explicitly saved into a custom Postgres table ensuring stateful persistence across sessions.
 - **Ultra-Responsive Layout**: Built with a "Mobile-First but Desktop-Ready" responsive strategy utilizing constrained layouts to keep the UI from breaking on ultra-wide monitors while staying beautifully snug on mobile displays.
 
@@ -36,4 +36,4 @@ Built natively in Flutter, it acts as a globalized news hub that lets you instan
 ## 📱 Interface Previews
 - **Landing Hero**: Deep gradient background introducing the application features dynamically.
 - **Global Auth Screen**: Context-switching login/registration cards natively tied to the custom SQL logic. 
-- **Slide-In Drawers**: Smooth-animated `SlideTransition` windows invoking Google Gemini data mapping logic over your main page Scaffold.
+- **Slide-In Drawers**: Smooth-animated `SlideTransition` windows invoking AI data mapping logic over your main page Scaffold.
