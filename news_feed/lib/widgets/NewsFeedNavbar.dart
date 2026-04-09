@@ -195,6 +195,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.person, color: Color(0xFF1A1A2E)),
+          position: PopupMenuPosition.under,
           onSelected: (String result) async {
             if (result == 'logout') {
               await SupabaseAuthService.logoutUser();
