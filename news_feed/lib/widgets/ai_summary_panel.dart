@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/news_model.dart';
 import '../models/gemini_service.dart';
+import '../screens/LoginRegisterPage.dart';
 
 void showAISummaryPanel(BuildContext context, NewsItem article) {
   showGeneralDialog(
@@ -46,11 +48,18 @@ class AISummaryContentView extends StatefulWidget {
 class _AISummaryContentViewState extends State<AISummaryContentView> {
   String? _summary;
   bool _isLoading = true;
+  bool _isGuest = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchSummary();
+    final isLoggedIn = Supabase.instance.client.auth.currentUser != null;
+    if (!isLoggedIn) {
+      _isGuest = true;
+      _isLoading = false;
+    } else {
+      _fetchSummary();
+    }
   }
 
   Future<void> _fetchSummary() async {
@@ -126,7 +135,45 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                   ),
                   const SizedBox(height: 16),
                   
-                  if (_isLoading)
+                  if (_isGuest)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24.0),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.lock_outline, size: 48, color: Colors.grey),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Authentication Required',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Log in or register a free account to unlock AI-powered article summaries!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey, height: 1.5),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const LoginRegisterPage()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1A1A2E),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                              ),
+                              child: const Text('Login / Sign Up'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (_isLoading)
                     const Center(
                       child: Padding(
                         padding: EdgeInsets.all(32.0),
