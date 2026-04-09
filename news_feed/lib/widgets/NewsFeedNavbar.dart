@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/CategoryNewsPage.dart'; 
 import '../screens/NewsFeedPage.dart'; 
 import '../screens/HomePage.dart'; 
+import '../screens/LoginRegisterPage.dart';
 import '../models/news_model.dart';
 import '../models/supabase_auth_service.dart';
 const Map<String, String> countryMap = {
@@ -203,27 +205,45 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                   (route) => false,
                 );
               }
+            } else if (result == 'login') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginRegisterPage()),
+              );
             } else if (result == 'profile') {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile coming soon!')));
             } else if (result == 'likes') {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Likes coming soon!')));
             }
           },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'profile',
-              child: Text('Profile'),
-            ),
-            const PopupMenuItem<String>(
-              value: 'likes',
-              child: Text('Likes'),
-            ),
-            const PopupMenuDivider(),
-            const PopupMenuItem<String>(
-              value: 'logout',
-              child: Text('Logout', style: TextStyle(color: Colors.red)),
-            ),
-          ],
+          itemBuilder: (BuildContext context) {
+            final isLoggedIn = Supabase.instance.client.auth.currentUser != null;
+
+            if (!isLoggedIn) {
+              return <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'login',
+                  child: Text('Login / Sign Up', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ];
+            }
+
+            return <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'profile',
+                child: Text('Profile'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'likes',
+                child: Text('Likes'),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Logout', style: TextStyle(color: Colors.red)),
+              ),
+            ];
+          },
         ),
         const SizedBox(width: 10),
       ],

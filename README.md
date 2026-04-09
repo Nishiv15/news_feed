@@ -1,6 +1,6 @@
 # NewsFeed
 
-A beautiful, premium cross-platform Flutter application providing highly curated, real-time localized news articles powered by an intelligent AI integration. 
+A premium cross-platform Flutter application providing highly curated, real-time localized news articles powered by an intelligent AI integration. 
 
 ---
 
