@@ -13,19 +13,21 @@ class SupabaseAuthService {
     final AuthResponse res = await _supabase.auth.signUp(
       email: email,
       password: password,
+      data: {
+        'display_name': username,
+      },
     );
 
     if (res.user != null) {
       try {
-        await _supabase.from('users').insert({
+        await _supabase.from('userinfo').insert({
           'id': res.user!.id,
           'username': username,
           'email': email,
-          'password': 'SUPABASE_AUTH_MANAGED', // Handled by SB Auth securely
           'country': country,
         });
       } catch (insertError) {
-        debugPrint('Error inserting to users table: $insertError');
+        debugPrint('Error inserting to userinfo table: $insertError');
       }
     } else {
       throw Exception('Registration failed to return a valid user.');
@@ -44,7 +46,7 @@ class SupabaseAuthService {
         
     if (res.user != null) {
       final userData = await _supabase
-          .from('users')
+          .from('userinfo')
           .select('country')
           .eq('email', email)
           .maybeSingle();
