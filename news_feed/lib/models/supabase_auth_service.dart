@@ -90,4 +90,56 @@ class SupabaseAuthService {
   static Future<void> logoutUser() async {
     await _supabase.auth.signOut();
   }
+
+
+  static Future<void> toggleSavedArticle(Map<String, dynamic> articleMap, bool isSaving) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return; // Fail gracefully if not logged in.
+    if (isSaving) {
+      // Insert explicitly
+      await _supabase.from('saved_articles').insert({
+        'user_id': user.id,
+        'title': articleMap['title'],
+        'description': articleMap['description'] ?? '',
+        'url': articleMap['url'],
+        'image_url': articleMap['imageUrl'],
+      });
+    } else {
+      await _supabase.from('saved_articles').delete().match({
+        'user_id': user.id,
+        'url': articleMap['url'],
+      });
+    }
+  }
+
+  static Future<bool> isArticleSaved(String articleUrl) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return false;
+
+    final response = await _supabase.from('saved_articles').select('id').match({
+      'user_id': user.id,
+      'url': articleUrl
+    }).maybeSingle();
+
+    return response != null;
+  }
+
+  static Future<List<Map<String, dynamic>>> fetchSavedArticles() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) return [];
+
+    final response = await _supabase.from('saved_articles').select().eq('user_id', user.id).order('created_at', ascending: false);
+    
+    return response.map<Map<String, dynamic>>((row) {
+      return {
+        'title': row['title'],
+        'description': row['description'],
+        'content': '', // Stubbed dynamically as column missing
+        'url': row['url'],
+        'imageUrl': row['image_url'],
+        'sourceName': 'Saved Article', // Stubbed formatting dynamically
+        'publishedAt': row['created_at'], 
+      };
+    }).toList();
+  }
 }

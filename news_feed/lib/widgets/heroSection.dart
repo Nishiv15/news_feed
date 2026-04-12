@@ -2,11 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/news_model.dart';
 import 'ai_summary_panel.dart';
+import '../models/supabase_auth_service.dart';
 
-class HeroSectionWidget extends StatelessWidget {
+class HeroSectionWidget extends StatefulWidget {
   final NewsItem newsItem;
+  final VoidCallback? onUnsave;
 
-  const HeroSectionWidget({super.key, required this.newsItem});
+  const HeroSectionWidget({super.key, required this.newsItem, this.onUnsave});
+
+  @override
+  State<HeroSectionWidget> createState() => _HeroSectionWidgetState();
+}
+
+class _HeroSectionWidgetState extends State<HeroSectionWidget> {
+  bool _isSaved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSavedState();
+  }
+
+  Future<void> _checkSavedState() async {
+    final saved = await SupabaseAuthService.isArticleSaved(widget.newsItem.url);
+    if (mounted) {
+      setState(() {
+        _isSaved = saved;
+      });
+    }
+  }
+
+  Future<void> _toggleSave() async {
+    final newSavedState = !_isSaved;
+    
+    setState(() {
+      _isSaved = newSavedState;
+    });
+
+    final articleMap = {
+      'title': widget.newsItem.title,
+      'description': widget.newsItem.description,
+      'url': widget.newsItem.url,
+      'imageUrl': widget.newsItem.imageUrl,
+    };
+
+    try {
+      await SupabaseAuthService.toggleSavedArticle(articleMap, newSavedState);
+      if (!newSavedState && widget.onUnsave != null) {
+        widget.onUnsave!();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isSaved = !newSavedState;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +66,12 @@ class HeroSectionWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: InkWell(
         onTap: () async {
-          final url = Uri.parse(newsItem.url);
+          final url = Uri.parse(widget.newsItem.url);
           if (await canLaunchUrl(url)) {
             await launchUrl(url, mode: LaunchMode.externalApplication);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Could not open article link: ${newsItem.url}')),
+              SnackBar(content: Text('Could not open article link: ${widget.newsItem.url}')),
             );
           }
         },
@@ -40,7 +92,7 @@ class HeroSectionWidget extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(16.0),
                 child: Image.network(
-                  newsItem.imageUrl,
+                  widget.newsItem.imageUrl,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
@@ -78,6 +130,27 @@ class HeroSectionWidget extends StatelessWidget {
                   ),
                 ),
               ),
+              
+              // Saved Heart Marker (Top Left)
+              Positioned(
+                top: 16,
+                left: 16,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      _isSaved ? Icons.favorite : Icons.favorite_border,
+                      color: _isSaved ? Colors.red : Colors.white,
+                      size: 28,
+                    ),
+                    tooltip: _isSaved ? 'Remove Bookmark' : 'Save Article',
+                    onPressed: _toggleSave,
+                  ),
+                ),
+              ),
 
               Positioned(
                 top: 16,
@@ -91,7 +164,7 @@ class HeroSectionWidget extends StatelessWidget {
                     icon: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
                     tooltip: 'AI Summary',
                     onPressed: () {
-                      showAISummaryPanel(context, newsItem);
+                      showAISummaryPanel(context, widget.newsItem);
                     },
                   ),
                 ),
@@ -105,7 +178,7 @@ class HeroSectionWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      newsItem.sourceName,
+                      widget.newsItem.sourceName,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
                         fontSize: 14,
@@ -114,7 +187,7 @@ class HeroSectionWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      newsItem.title,
+                      widget.newsItem.title,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 32,
@@ -128,7 +201,7 @@ class HeroSectionWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      newsItem.description,
+                      widget.newsItem.description,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: 16,

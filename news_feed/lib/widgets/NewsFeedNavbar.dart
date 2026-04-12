@@ -5,6 +5,7 @@ import '../screens/NewsFeedPage.dart';
 import '../screens/HomePage.dart'; 
 import '../screens/LoginRegisterPage.dart';
 import '../screens/ProfilePage.dart';
+import '../screens/SavedArticlesPage.dart';
 import '../models/news_model.dart';
 import '../models/supabase_auth_service.dart';
 const Map<String, String> countryMap = {
@@ -64,27 +65,45 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width > 950;
     final activeCategory = currentCategory ?? 'Home';
+    final canPop = Navigator.of(context).canPop();
 
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 1,
 
-      leadingWidth: isDesktop ? 180 : 120,
+      leadingWidth: isDesktop ? (canPop ? 220 : 180) : (canPop ? 170 : 120),
       leading: Padding(
         padding: EdgeInsets.only(left: isDesktop ? 20.0 : 10.0),
-        child: InkWell(
-          onTap: () => _handleCategoryTap(context, 'Home'),
-          child: const Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'NewsFeed',
-              style: TextStyle(
-                color: Color(0xFF1A1A2E),
-                fontSize: 21,
-                fontWeight: FontWeight.bold,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (canPop)
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.arrow_back, color: Color(0xFF1A1A2E)),
+                tooltip: 'Back',
+                onPressed: () => Navigator.pop(context),
+              ),
+            if (canPop) const SizedBox(width: 8),
+            Expanded(
+              child: InkWell(
+                onTap: () => _handleCategoryTap(context, 'Home'),
+                child: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'NewsFeed',
+                    style: TextStyle(
+                      color: Color(0xFF1A1A2E),
+                      fontSize: 21,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
 
@@ -226,8 +245,11 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                   );
                 }
               });
-            } else if (result == 'likes') {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Likes coming soon!')));
+            } else if (result == 'Saved') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SavedArticlesPage()),
+              );
             }
           },
           itemBuilder: (BuildContext context) {
@@ -248,8 +270,8 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Text('Profile'),
               ),
               const PopupMenuItem<String>(
-                value: 'likes',
-                child: Text('Likes'),
+                value: 'Saved',
+                child: Text('Saved'),
               ),
               const PopupMenuDivider(),
               const PopupMenuItem<String>(
