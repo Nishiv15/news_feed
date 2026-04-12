@@ -22,8 +22,6 @@ class SupabaseAuthService {
       try {
         await _supabase.from('userinfo').insert({
           'id': res.user!.id,
-          'username': username,
-          'email': email,
           'country': country,
         });
       } catch (insertError) {
@@ -34,7 +32,6 @@ class SupabaseAuthService {
     }
   }
 
-  /// Logs a user in and retrieves their specific country choice from DB
   static Future<String?> loginUser({
     required String email,
     required String password,
@@ -48,11 +45,11 @@ class SupabaseAuthService {
       final userData = await _supabase
           .from('userinfo')
           .select('country')
-          .eq('email', email)
+          .eq('id', res.user!.id)
           .maybeSingle();
 
-      if (userData != null && userData['country'] != null) {
-        return userData['country'] as String;
+      if (userData != null) {
+        return userData['country'] as String?;
       }
       return null;
     } else {
@@ -60,7 +57,6 @@ class SupabaseAuthService {
     }
   }
 
-  /// Logs out the currently authenticated user
   static Future<void> logoutUser() async {
     await _supabase.auth.signOut();
   }
