@@ -1,8 +1,7 @@
-// lib/hero_section_widget.dart
-
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/news_model.dart';
+import 'ai_summary_panel.dart';
 
 class HeroSectionWidget extends StatelessWidget {
   final NewsItem newsItem;
@@ -76,6 +75,24 @@ class HeroSectionWidget extends StatelessWidget {
                       Colors.black.withOpacity(0.1),
                       Colors.black.withOpacity(0.7),
                     ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+                    tooltip: 'AI Summary',
+                    onPressed: () {
+                      showAISummaryPanel(context, newsItem);
+                    },
                   ),
                 ),
               ),
