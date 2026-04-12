@@ -4,6 +4,7 @@ import '../screens/CategoryNewsPage.dart';
 import '../screens/NewsFeedPage.dart'; 
 import '../screens/HomePage.dart'; 
 import '../screens/LoginRegisterPage.dart';
+import '../screens/ProfilePage.dart';
 import '../models/news_model.dart';
 import '../models/supabase_auth_service.dart';
 const Map<String, String> countryMap = {
@@ -212,7 +213,19 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                 MaterialPageRoute(builder: (context) => const LoginRegisterPage()),
               );
             } else if (result == 'profile') {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile coming soon!')));
+              final initialCountry = globalCountry;
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              ).then((_) {
+                if (initialCountry != globalCountry && context.mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const NewsFeedPage()),
+                    (Route<dynamic> route) => false,
+                  );
+                }
+              });
             } else if (result == 'likes') {
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Likes coming soon!')));
             }

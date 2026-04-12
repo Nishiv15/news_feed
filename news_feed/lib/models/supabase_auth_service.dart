@@ -57,6 +57,36 @@ class SupabaseAuthService {
     }
   }
 
+  static Future<void> updateUserProfile({
+    required String newUsername,
+    required String newCountry,
+  }) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('No authenticated user found.');
+
+    await _supabase.auth.updateUser(
+      UserAttributes(
+        data: {'display_name': newUsername},
+      ),
+    );
+
+    await _supabase.from('userinfo').upsert({
+      'id': user.id,
+      'country': newCountry,
+      'updated_at': DateTime.now().toIso8601String(),
+      });
+  }
+
+  static Future<void> updateUserPassword({required String newPassword}) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('No authenticated user found.');
+    
+    await _supabase.auth.updateUser(UserAttributes(
+      password: newPassword,
+    ));
+  }
+
+  /// Logs out the currently authenticated user
   static Future<void> logoutUser() async {
     await _supabase.auth.signOut();
   }
