@@ -8,16 +8,16 @@ class FooterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 30,
       ),
       color: const Color(0xFF1A1A2E),
-      child: Center(
-        child: Text(
-          '© ${DateTime.now().year} NewsFeed. All rights reserved.',
-          style: const TextStyle(color: Colors.white, fontSize: 14),
-        ),
+      child: Text(
+        '© ${DateTime.now().year} NewsFeed. All rights reserved.',
+        textAlign: TextAlign.center,
+        style: const TextStyle(color: Colors.white, fontSize: 14),
       ),
     );
   }
