@@ -17,11 +17,11 @@ class _NewsFeedPageState extends State<NewsFeedPage> {
   final Map<String, String> sectionTitles = const {
     'general': 'Latest Headlines',
     'world': 'World',
-    // 'nation': 'Nation',
-    // 'business': 'Business',
-    // 'technology': 'Technology',
-    // 'entertainment': 'Entertainment',
-    // 'sports': 'Sports',
+    'nation': 'Nation',
+    'business': 'Business',
+    'technology': 'Technology',
+    'entertainment': 'Entertainment',
+    'sports': 'Sports',
   };
 
   NewsItem? _heroArticle;
