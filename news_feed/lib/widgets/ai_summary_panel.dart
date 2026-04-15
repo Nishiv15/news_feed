@@ -133,6 +133,15 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                       color: Color(0xFF1A1A2E),
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '*Note -> AI can make mistakes.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.black.withOpacity(0.4),
+                    ),
+                  ),
                   const SizedBox(height: 16),
                   
                   if (_isGuest)
