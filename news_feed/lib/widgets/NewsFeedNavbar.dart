@@ -39,15 +39,16 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
 
   void _handleCategoryTap(BuildContext context, String category) {
     if (category == 'Home') {
-      Navigator.popUntil(context, (route) => route.isFirst);
-      if (ModalRoute.of(context)?.settings.name != null &&
-          ModalRoute.of(context)?.settings.name != '/') {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const NewsFeedPage()),
-          (Route<dynamic> route) => false,
-        );
+      final isOnNewsFeedPage = context.findAncestorWidgetOfExactType<NewsFeedPage>() != null;
+      if (isOnNewsFeedPage) {
+        return;
       }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const NewsFeedPage()),
+        (Route<dynamic> route) => false,
+      );
     }
     else {
       final apiCategory = categoryMap[category]!;
