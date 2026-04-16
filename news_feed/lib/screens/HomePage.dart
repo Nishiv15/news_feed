@@ -19,12 +19,11 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 120.0),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
+                  begin: Alignment.topCenter,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF0F2027),
-                    Color(0xFF203A43),
-                    Color(0xFF2C5364),
+                    Color(0xFF1A1A2E),
+                    Color(0xFF0F3460),
                   ],
                 ),
               ),
@@ -139,10 +138,8 @@ class HomePage extends StatelessWidget {
                   'news from the United States, India, the United Kingdom, and dozens of other '
                   'supported countries around the globe. Get the perspective you need, instantly.',
               imageLeft: true,
-              backgroundColor: const Color(0xFFD6EAF8), 
+              backgroundColor: const Color(0xFFF8F9FA), 
             ),
-            
-            const Divider(height: 1, thickness: 1, color: Colors.black54),
             
             // Feature Section 2
             _buildLargeFeatureSection(
@@ -153,11 +150,9 @@ class HomePage extends StatelessWidget {
                   'Business and Technology to Entertainment and Sports. Deep dive into specialized '
                   'feeds designed perfectly to match your interests.',
               imageLeft: false,
-              backgroundColor: const Color(0xFFD6EAF8), 
+              backgroundColor: Colors.white, 
             ),
             
-            const Divider(height: 1, thickness: 1, color: Colors.black54),
-
             // Feature Section 3
             _buildLargeFeatureSection(
               icon: Icons.auto_awesome,
@@ -167,7 +162,7 @@ class HomePage extends StatelessWidget {
                   'Instantly generate crisp, accurate, and lightning-fast summaries of any headline '
                   'so you can grasp the core story in mere seconds without skipping a beat.',
               imageLeft: true,
-              backgroundColor: const Color(0xFFD6EAF8), 
+              backgroundColor: const Color(0xFFF8F9FA), 
             ),
 
             const FooterWidget(),
