@@ -69,7 +69,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
     final canPop = Navigator.of(context).canPop();
 
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1A1A2E),
       elevation: 1,
 
       leadingWidth: isDesktop ? (canPop ? 220 : 180) : (canPop ? 170 : 120),
@@ -82,7 +82,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.arrow_back, color: Color(0xFF1A1A2E)),
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
                 tooltip: 'Back',
                 onPressed: () => Navigator.pop(context),
               ),
@@ -95,7 +95,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     'NewsFeed',
                     style: TextStyle(
-                      color: Color(0xFF1A1A2E),
+                      color: Colors.white,
                       fontSize: 21,
                       fontWeight: FontWeight.bold,
                     ),
@@ -125,8 +125,8 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                       style: TextStyle(
                         // Highlight the selected category
                         color: isSelected
-                            ? const Color(0xFF1A1A2E)
-                            : Colors.grey[700],
+                            ? Colors.white
+                            : Colors.grey[400],
                         fontSize: 16,
                         fontWeight: isSelected
                             ? FontWeight.w900
@@ -134,7 +134,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                         decoration: isSelected
                             ? TextDecoration.underline
                             : null,
-                        decorationColor: const Color(0xFF1A1A2E),
+                        decorationColor: Colors.white,
                         decorationThickness: 3,
                         decorationStyle: TextDecorationStyle.solid,
                       ),
@@ -149,7 +149,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         if (!isDesktop)
           PopupMenuButton<String>(
             onSelected: (String result) => _handleCategoryTap(context, result),
-            icon: const Icon(Icons.menu, color: Color(0xFF1A1A2E)),
+            icon: const Icon(Icons.menu, color: Colors.white),
             itemBuilder: (BuildContext context) {
               return categoryMap.keys.map((String category) {
                 return PopupMenuItem<String>(
@@ -173,7 +173,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
         DropdownButtonHideUnderline(
           child: DropdownButton<String>(
             value: globalCountry,
-            icon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1A1A2E)),
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
             dropdownColor: Colors.white,
             onChanged: (String? newValue) {
               if (newValue != null && newValue != globalCountry) {
@@ -192,7 +192,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
                   child: Text(
                     value.toUpperCase(),
                     style: const TextStyle(
-                      color: Color(0xFF1A1A2E),
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -215,7 +215,7 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.person, color: Color(0xFF1A1A2E)),
+          icon: const Icon(Icons.person, color: Colors.white),
           position: PopupMenuPosition.under,
           onSelected: (String result) async {
             if (result == 'logout') {

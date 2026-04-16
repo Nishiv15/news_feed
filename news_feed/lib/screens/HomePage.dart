@@ -301,13 +301,13 @@ class _HomeNavBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1A1A2E),
       elevation: 1,
       centerTitle: false,
       title: const Text(
         'NewsFeed',
         style: TextStyle(
-          color: Color(0xFF1A1A2E),
+          color: Colors.white,
           fontSize: 24,
           fontWeight: FontWeight.w900,
         ),
@@ -330,7 +330,7 @@ class _HomeNavBar extends StatelessWidget implements PreferredSizeWidget {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A2E),
+              color: Colors.white,
             ),
           ),
         ),
