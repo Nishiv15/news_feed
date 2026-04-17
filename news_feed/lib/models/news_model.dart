@@ -96,44 +96,6 @@ Future<NewsItem?> fetchHeroArticle() async {
   return null; 
 }
 
-Future<List<NewsItem>> fetchArticlesByCategory(String category) async {
-  final url = Uri.parse(
-    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$maxArticles&apikey=$apiKey',
-  );
-
-  try {
-    if (kDebugMode) {
-      print('Fetching articles for category: $category');
-    }
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final articles = data['articles'] as List;
-
-      List<NewsItem> newsItems = articles
-          .map((json) => NewsItem.fromJson(json))
-          .toList();
-      return newsItems;
-    } else {
-      if (kDebugMode) {
-        print(
-          'Category API Request failed for $category with status: ${response.statusCode}',
-        );
-        print('Response Body: ${response.body}');
-      }
-      throw Exception(
-        'Failed to load $category news: Status ${response.statusCode}',
-      );
-    }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Error during $category API fetch: $e');
-    }
-  }
-  return []; 
-}
 
 Future<List<NewsItem>> fetchCategory(String category, {int max = 10}) async {
   final url = Uri.parse(
