@@ -4,6 +4,7 @@ import '../models/supabase_auth_service.dart';
 import '../models/news_model.dart';
 import '../widgets/NewsFeedNavbar.dart';
 import '../widgets/NewsFeedFooter.dart';
+import '../screens/HomePage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String _selectedCountry = globalCountry;
   bool _isProfileUpdating = false;
   bool _isPasswordUpdating = false;
+  bool _isAccountDeleting = false;
 
   @override
   void initState() {
@@ -108,6 +110,68 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) {
         setState(() {
           _isPasswordUpdating = false;
+        });
+      }
+    }
+  }
+
+  void _showDeleteConfirmation() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: const Text(
+          'Are you sure you want to permanently delete your account? '
+          'This action cannot be undone and will erase all your saved articles and preferences.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _deleteAccount();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Yes, Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    setState(() {
+      _isAccountDeleting = true;
+    });
+
+    try {
+      await SupabaseAuthService.deleteAccount();
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (Route<dynamic> route) => false,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Account permanently deleted.', style: TextStyle(fontWeight: FontWeight.bold)),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting account: $e'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isAccountDeleting = false;
         });
       }
     }
@@ -293,7 +357,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   child: ElevatedButton(
                                     onPressed: _isPasswordUpdating ? null : _updatePassword,
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.red[800],
+                                      backgroundColor: const Color(0xFF1A1A2E), 
                                       foregroundColor: Colors.white,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -309,6 +373,35 @@ class _ProfilePageState extends State<ProfilePage> {
                                             'Change Password',
                                             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                                           ),
+                                  ),
+                                ),
+                                const SizedBox(height: 30),
+                                const Divider(height: 1, thickness: 1),
+                                const SizedBox(height: 30),
+                                
+                                // DELETE ACCOUNT BUTTON
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _isAccountDeleting ? null : _showDeleteConfirmation,
+                                    icon: _isAccountDeleting 
+                                        ? const SizedBox(
+                                            height: 20, 
+                                            width: 20, 
+                                            child: CircularProgressIndicator(color: Colors.red, strokeWidth: 2)
+                                          )
+                                        : const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                                    label: Text(
+                                      _isAccountDeleting ? 'Deleting...' : 'Delete Account',
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      side: const BorderSide(color: Colors.red, width: 2),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

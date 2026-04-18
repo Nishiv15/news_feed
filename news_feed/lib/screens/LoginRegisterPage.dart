@@ -58,7 +58,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         }
       } else {
         // REGISTER FLOW
-        await SupabaseAuthService.registerUser(
+        final result = await SupabaseAuthService.registerUser(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           username: _usernameController.text.trim(),
@@ -69,7 +69,15 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful!')),
+            SnackBar(
+              content: Text(
+                result == 'reactivated'
+                    ? 'Welcome back! Your account has been reactivated.'
+                    : 'Registration successful!',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              backgroundColor: Colors.green,
+            ),
           );
           Navigator.pushAndRemoveUntil(
             context,

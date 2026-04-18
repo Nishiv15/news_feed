@@ -4,12 +4,57 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SupabaseAuthService {
   static final _supabase = Supabase.instance.client;
 
-  static Future<void> registerUser({
+  /// Checks if a user exists in userinfo and returns their isActive status.
+  static Future<bool?> _checkUserActiveStatus(String userId) async {
+    final row = await _supabase
+        .from('userinfo')
+        .select('isActive')
+        .eq('id', userId)
+        .maybeSingle();
+    if (row == null) return null; // User not in userinfo
+    return row['isActive'] as bool;
+  }
+
+  
+  static Future<String> registerUser({
     required String email,
     required String password,
     required String username,
     required String country,
   }) async {
+    // Try signing in first to check if this email already exists in auth
+    try {
+      final loginRes = await _supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+
+      if (loginRes.user != null) {
+        final isActive = await _checkUserActiveStatus(loginRes.user!.id);
+
+        if (isActive == true) {
+          // Active user trying to register again
+          await _supabase.auth.signOut();
+          throw Exception('User already registered. Please login instead.');
+        } else if (isActive == false) {
+          // Reactivate the soft-deleted account
+          await _supabase.from('userinfo').update({
+            'isActive': true,
+            'country': country,
+            'updated_at': DateTime.now().toIso8601String(),
+          }).eq('id', loginRes.user!.id);
+
+          await _supabase.auth.updateUser(
+            UserAttributes(data: {'display_name': username}),
+          );
+
+          return 'reactivated';
+        }
+      }
+    } on AuthException {
+    }
+
+    // Normal registration
     final AuthResponse res = await _supabase.auth.signUp(
       email: email,
       password: password,
@@ -27,6 +72,7 @@ class SupabaseAuthService {
       } catch (insertError) {
         debugPrint('Error inserting to userinfo table: $insertError');
       }
+      return 'registered';
     } else {
       throw Exception('Registration failed to return a valid user.');
     }
@@ -44,11 +90,18 @@ class SupabaseAuthService {
     if (res.user != null) {
       final userData = await _supabase
           .from('userinfo')
-          .select('country')
+          .select('country, isActive')
           .eq('id', res.user!.id)
           .maybeSingle();
 
       if (userData != null) {
+        final bool isActive = userData['isActive'] ?? true;
+        if (!isActive) {
+          await _supabase.auth.signOut();
+          throw Exception(
+            'Your account has been deactivated. Please register again to reactivate.',
+          );
+        }
         return userData['country'] as String?;
       }
       return null;
@@ -88,6 +141,20 @@ class SupabaseAuthService {
 
   /// Logs out the currently authenticated user
   static Future<void> logoutUser() async {
+    await _supabase.auth.signOut();
+  }
+
+  static Future<void> deleteAccount() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('No authenticated user found.');
+
+    await _supabase.from('saved_articles').delete().eq('user_id', user.id);
+
+    await _supabase.from('userinfo').update({
+      'isActive': false,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('id', user.id);
+    
     await _supabase.auth.signOut();
   }
 
