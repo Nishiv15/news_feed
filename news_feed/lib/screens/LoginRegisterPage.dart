@@ -20,6 +20,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 
   bool _isLogin = true;
   bool _isLoading = false;
+  bool _obscurePassword = true;
   String _selectedCountry = 'us'; // Default
 
   @override
@@ -208,10 +209,24 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 
                       TextFormField(
                         controller: _passwordController,
-                        obscureText: true,
+                        obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: 'Password',
                           prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: Colors.grey[600],
+                            ),
+                            tooltip: _obscurePassword ? 'Show password' : 'Hide password',
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
