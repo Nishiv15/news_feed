@@ -4,6 +4,8 @@ import '../models/news_model.dart';
 import '../widgets/heroSection.dart';
 import '../widgets/news_card_widget.dart';
 import '../widgets/NewsFeedFooter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'LoginRegisterPage.dart';
 
 class NewsFeedPage extends StatefulWidget {
   const NewsFeedPage({super.key});
@@ -88,6 +90,42 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }
 
   Future<void> _loadMoreNews() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Login Required'),
+            content: const Text('You need an account to load more articles. Please login or register to continue.'),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginRegisterPage()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _ink,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: const Text('Login / Register'),
+              ),
+            ],
+          ),
+        );
+      }
+      return;
+    }
+
     if (_isLoadingMore) return;
     setState(() => _isLoadingMore = true);
 
