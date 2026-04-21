@@ -97,9 +97,9 @@ Future<NewsItem?> fetchHeroArticle() async {
 }
 
 
-Future<List<NewsItem>> fetchCategory(String category, {int max = 10}) async {
+Future<List<NewsItem>> fetchCategory(String category, {int max = 10, int page = 1}) async {
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&apikey=$apiKey',
+    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&page=$page&apikey=$apiKey',
   );
 
   try {

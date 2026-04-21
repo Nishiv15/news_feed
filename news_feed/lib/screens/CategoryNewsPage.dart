@@ -25,6 +25,9 @@ class _CategoryNewsPageState extends State<CategoryNewsPage>
   bool _hasError = false;
   final int _maxArticles = 10;
 
+  int _currentPage = 1;
+  bool _isLoadingMore = false;
+
   late AnimationController _shimmerController;
 
   static const Color _bg = Color(0xFFF7F4EF);
@@ -86,6 +89,37 @@ class _CategoryNewsPageState extends State<CategoryNewsPage>
         _hasError = true;
       });
       debugPrint('Error loading ${widget.pageTitle} news: $e');
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isLoadingMore) return;
+    setState(() => _isLoadingMore = true);
+
+    try {
+      final nextPage = _currentPage + 1;
+      final moreArticles = await fetchCategory(
+        widget.apiCategory,
+        max: _maxArticles,
+        page: nextPage,
+      );
+      if (mounted && moreArticles.isNotEmpty) {
+        setState(() {
+          _articles.addAll(moreArticles);
+          _currentPage = nextPage;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not load more articles: $e'),
+            backgroundColor: Colors.red[700],
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingMore = false);
     }
   }
 
@@ -323,7 +357,50 @@ class _CategoryNewsPageState extends State<CategoryNewsPage>
                         ),
                       ),
 
-                    const SizedBox(height: 70),
+                    // Load More button
+                    if (!_isLoading && !_hasError && _articles.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+                        child: Center(
+                          child: SizedBox(
+                            width: 220,
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: _isLoadingMore ? null : _loadMore,
+                              icon: _isLoadingMore
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.expand_more_rounded, size: 22),
+                              label: Text(
+                                _isLoadingMore ? 'Loading...' : 'Load More',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.3,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _ink,
+                                foregroundColor: Colors.white,
+                                disabledBackgroundColor: _ink.withOpacity(0.5),
+                                disabledForegroundColor: Colors.white70,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                elevation: 0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
