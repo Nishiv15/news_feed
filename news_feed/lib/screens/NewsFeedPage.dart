@@ -8,7 +8,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'LoginRegisterPage.dart';
 
 class NewsFeedPage extends StatefulWidget {
-  const NewsFeedPage({super.key});
+  final String? initialCategoryTitle;
+  const NewsFeedPage({super.key, this.initialCategoryTitle});
 
   @override
   State<NewsFeedPage> createState() => _NewsFeedPageState();
@@ -24,6 +25,9 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   String? _generalError;
   bool _isGeneralLoading = true;
 
+  String _currentCategoryTitle = 'Home';
+  String _apiCategory = 'general';
+
   int _currentPage = 1;
   bool _isLoadingMore = false;
 
@@ -34,9 +38,21 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   static const Color _ink = Color(0xFF1A1A2E);
   static const Color _muted = Color(0xFF6B7280);
 
+  static const Map<String, _CategoryMeta> _categoryMeta = {
+    'business':    _CategoryMeta(Color(0xFF1A3A5C), Color(0xFF2D6EA8), Icons.business_center_outlined),
+    'entertainment': _CategoryMeta(Color(0xFF5C1A3A), Color(0xFFA82D6E), Icons.movie_filter_outlined),
+    'general':     _CategoryMeta(Color(0xFF1A1A2E), Color(0xFF3A3A6E), Icons.public_outlined),
+    'health':      _CategoryMeta(Color(0xFF1A5C2E), Color(0xFF2DA84B), Icons.favorite_outline),
+    'science':     _CategoryMeta(Color(0xFF3A1A5C), Color(0xFF6E2DA8), Icons.science_outlined),
+    'sports':      _CategoryMeta(Color(0xFF5C2E1A), Color(0xFFA84B2D), Icons.sports_soccer_outlined),
+    'technology':  _CategoryMeta(Color(0xFF0D3D3D), Color(0xFF0D7777), Icons.memory_outlined),
+  };
+
   @override
   void initState() {
     super.initState();
+    _currentCategoryTitle = widget.initialCategoryTitle ?? 'Home';
+    _apiCategory = categoryMap[_currentCategoryTitle] ?? 'general';
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -51,19 +67,29 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }
 
   Future<void> _loadNews() async {
-    // Fetch Hero
-    try {
-      final hero = await fetchHeroArticle();
-      if (mounted) {
-        setState(() {
-          _heroArticle = hero;
-          _isHeroLoading = false;
-        });
+    // Only Fetch Hero if on Home Page
+    if (_currentCategoryTitle == 'Home') {
+      try {
+        final hero = await fetchHeroArticle();
+        if (mounted) {
+          setState(() {
+            _heroArticle = hero;
+            _isHeroLoading = false;
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() {
+            _heroError = e.toString();
+            _isHeroLoading = false;
+          });
+        }
       }
-    } catch (e) {
+    } else {
+      // Clear hero if not on Home
       if (mounted) {
         setState(() {
-          _heroError = e.toString();
+          _heroArticle = null;
           _isHeroLoading = false;
         });
       }
@@ -72,7 +98,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     await Future.delayed(const Duration(milliseconds: 1500));
 
     try {
-      final articles = await fetchCategory('general', max: 10);
+      final articles = await fetchCategory(_apiCategory, max: 10);
       if (mounted) {
         setState(() {
           _generalArticles = articles;
@@ -131,7 +157,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
     try {
       final nextPage = _currentPage + 1;
-      final moreArticles = await fetchCategory('general', max: 10, page: nextPage);
+      final moreArticles = await fetchCategory(_apiCategory, max: 10, page: nextPage);
       if (mounted && moreArticles.isNotEmpty) {
         setState(() {
           _generalArticles.addAll(moreArticles);
@@ -150,6 +176,25 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     } finally {
       if (mounted) setState(() => _isLoadingMore = false);
     }
+  }
+
+  void _onCategorySelected(String categoryKey) {
+    if (_currentCategoryTitle == categoryKey) return;
+
+    setState(() {
+      _currentCategoryTitle = categoryKey;
+      _apiCategory = categoryMap[categoryKey] ?? 'general';
+      _isGeneralLoading = true;
+      _generalError = null;
+      _generalArticles.clear();
+      if (_currentCategoryTitle == 'Home') {
+        _isHeroLoading = true;
+        _heroError = null;
+      }
+      _currentPage = 1;
+    });
+
+    _loadNews();
   }
 
   // Shimmer skeleton 
@@ -264,10 +309,89 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     );
   }
 
+  // Category Banner
+  Widget _buildCategoryBanner(_CategoryMeta meta) {
+    if (_currentCategoryTitle == 'Home') return const SizedBox.shrink();
+    
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 36, 24, 28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [meta.colorDark, meta.colorLight],
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Icon(meta.icon, color: Colors.white.withOpacity(0.25), size: 80),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _currentCategoryTitle.toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '$_currentCategoryTitle News',
+                  style: const TextStyle(
+                    fontFamily: 'Georgia',
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                if (!_isGeneralLoading && _generalError == null && _generalArticles.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.white30),
+                    ),
+                    child: Text(
+                      '${_generalArticles.length} articles currently loaded',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final meta = _categoryMeta[_apiCategory.toLowerCase()] ??
+        const _CategoryMeta(Color(0xFF1A1A2E), Color(0xFF3A3A6E), Icons.article_outlined);
+
+    final sectionTitle = _currentCategoryTitle == 'Home' 
+        ? 'Latest Headlines' 
+        : '$_currentCategoryTitle Headlines';
+
     return Scaffold(
-      appBar: const NewsFeedNavBar(),
+      appBar: NewsFeedNavBar(
+        currentCategory: _currentCategoryTitle,
+        onCategorySelected: _onCategorySelected,
+      ),
       backgroundColor: _bg,
       body: CustomScrollView(
         slivers: [
@@ -278,22 +402,27 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    // HERO 
-                    const SizedBox(height: 20),
-                    if (_isHeroLoading)
-                      _buildHeroSkeleton(context)
-                    else if (_heroError != null)
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: _ErrorBanner(message: 'Could not load top story.'),
-                      )
-                    else if (_heroArticle != null)
-                      HeroSectionWidget(newsItem: _heroArticle!)
-                    else
-                      const SizedBox.shrink(),
+                    
+                    if (_currentCategoryTitle != 'Home')
+                      _buildCategoryBanner(meta),
+
+                    if (_currentCategoryTitle == 'Home') ...[
+                      const SizedBox(height: 20),
+                      if (_isHeroLoading)
+                        _buildHeroSkeleton(context)
+                      else if (_heroError != null)
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: _ErrorBanner(message: 'Could not load top story.'),
+                        )
+                      else if (_heroArticle != null)
+                        HeroSectionWidget(newsItem: _heroArticle!)
+                      else
+                        const SizedBox.shrink(),
+                    ],
 
                     // LATEST HEADLINES 
-                    _buildSectionHeader('Latest Headlines', live: true),
+                    _buildSectionHeader(sectionTitle, live: true),
 
                     const _SectionDivider(),
 
@@ -518,4 +647,11 @@ class _ErrorBanner extends StatelessWidget {
       ),
     );
   }
+}
+
+class _CategoryMeta {
+  final Color colorDark;
+  final Color colorLight;
+  final IconData icon;
+  const _CategoryMeta(this.colorDark, this.colorLight, this.icon);
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../screens/CategoryNewsPage.dart'; 
 import '../screens/NewsFeedPage.dart'; 
 import '../screens/HomePage.dart'; 
 import '../screens/LoginRegisterPage.dart';
@@ -34,10 +33,16 @@ const Map<String, String> categoryMap = {
 
 class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
   final String? currentCategory;
+  final void Function(String)? onCategorySelected;
 
-  const NewsFeedNavBar({super.key, this.currentCategory});
+  const NewsFeedNavBar({super.key, this.currentCategory, this.onCategorySelected});
 
   void _handleCategoryTap(BuildContext context, String category) {
+    if (onCategorySelected != null) {
+      onCategorySelected!(category);
+      return;
+    }
+
     if (category == 'Home') {
       final isOnNewsFeedPage = context.findAncestorWidgetOfExactType<NewsFeedPage>() != null;
       if (isOnNewsFeedPage) {
@@ -51,13 +56,12 @@ class NewsFeedNavBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
     else {
-      final apiCategory = categoryMap[category]!;
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              CategoryNewsPage(apiCategory: apiCategory, pageTitle: category),
+          builder: (context) => const NewsFeedPage(),
         ),
+        (Route<dynamic> route) => false,
       );
     }
   }
