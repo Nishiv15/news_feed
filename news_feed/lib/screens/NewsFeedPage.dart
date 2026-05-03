@@ -588,7 +588,7 @@ class _LiveBadgeState extends State<_LiveBadge>
             ),
             const SizedBox(width: 4),
             const Text(
-              'LIVE',
+              'Trending',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 10,
