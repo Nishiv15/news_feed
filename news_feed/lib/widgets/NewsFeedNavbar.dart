@@ -7,16 +7,44 @@ import '../screens/ProfilePage.dart';
 import '../screens/SavedArticlesPage.dart';
 import '../models/news_model.dart';
 import '../models/supabase_auth_service.dart';
+
 const Map<String, String> countryMap = {
-  'Argentina': 'ar', 'Australia': 'au', 'Bangladesh': 'bd', 'Brazil': 'br',
-  'Canada': 'ca', 'China': 'cn', 'Colombia': 'co', 'Egypt': 'eg',
-  'France': 'fr', 'Germany': 'de', 'Greece': 'gr', 'Hong Kong': 'hk',
-  'India': 'in', 'Indonesia': 'id', 'Ireland': 'ie', 'Israel': 'il',
-  'Italy': 'it', 'Japan': 'jp', 'Malaysia': 'my', 'Mexico': 'mx',
-  'Netherlands': 'nl', 'Norway': 'no', 'Pakistan': 'pk', 'Peru': 'pe',
-  'Philippines': 'ph', 'Portugal': 'pt', 'Romania': 'ro', 'Russia': 'ru',
-  'Singapore': 'sg', 'Spain': 'es', 'Sweden': 'se', 'Switzerland': 'ch',
-  'Taiwan': 'tw', 'Turkey': 'tr', 'Ukraine': 'ua', 'United Kingdom': 'gb',
+  'Argentina': 'ar',
+  'Australia': 'au',
+  'Bangladesh': 'bd',
+  'Brazil': 'br',
+  'Canada': 'ca',
+  'China': 'cn',
+  'Colombia': 'co',
+  'Egypt': 'eg',
+  'France': 'fr',
+  'Germany': 'de',
+  'Greece': 'gr',
+  'Hong Kong': 'hk',
+  'India': 'in',
+  'Indonesia': 'id',
+  'Ireland': 'ie',
+  'Israel': 'il',
+  'Italy': 'it',
+  'Japan': 'jp',
+  'Malaysia': 'my',
+  'Mexico': 'mx',
+  'Netherlands': 'nl',
+  'Norway': 'no',
+  'Pakistan': 'pk',
+  'Peru': 'pe',
+  'Philippines': 'ph',
+  'Portugal': 'pt',
+  'Romania': 'ro',
+  'Russia': 'ru',
+  'Singapore': 'sg',
+  'Spain': 'es',
+  'Sweden': 'se',
+  'Switzerland': 'ch',
+  'Taiwan': 'tw',
+  'Turkey': 'tr',
+  'Ukraine': 'ua',
+  'United Kingdom': 'gb',
   'United States': 'us',
 };
 
@@ -30,13 +58,11 @@ const Map<String, String> categoryMap = {
   'Entertainment': 'entertainment',
 };
 
-// Design tokens 
-
-const _kNavBg      = Color(0xFF12121F);   // deep navy
-const _kAccent     = Color(0xFFD6472B);   // editorial red
+const _kNavBg = Color(0xFF12121F);
+const _kAccent = Color(0xFFD6472B);
 const _kTextActive = Colors.white;
-const _kTextMuted  = Color(0xFF8A8FA8);
-const _kDivider    = Color(0xFF2A2A3E);
+const _kTextMuted = Color(0xFF8A8FA8);
+const _kDivider = Color(0xFF2A2A3E);
 
 class NewsFeedNavBar extends StatefulWidget implements PreferredSizeWidget {
   final String? currentCategory;
@@ -58,7 +84,7 @@ class NewsFeedNavBar extends StatefulWidget implements PreferredSizeWidget {
 class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
   final _categoryScrollCtrl = ScrollController();
 
-  // Navigation helpers 
+  // Navigation helpers
   void _handleCategoryTap(BuildContext context, String category) {
     if (widget.onCategorySelected != null) {
       widget.onCategorySelected!(category);
@@ -109,7 +135,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
     }
   }
 
-  // Category strip 
+  // Category strip
   Widget _buildCategoryStrip(String activeCategory) {
     final categories = categoryMap.keys.toList();
 
@@ -137,7 +163,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
     );
   }
 
-  // Country pill 
+  // Country pill
   Widget _buildCountryPicker(BuildContext context) {
     final currentName = countryMap.entries
         .firstWhere(
@@ -176,8 +202,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
                 entry.key,
                 style: TextStyle(
                   color: isSelected ? _kAccent : Colors.white70,
-                  fontWeight:
-                      isSelected ? FontWeight.bold : FontWeight.normal,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   fontSize: 13,
                 ),
               ),
@@ -221,8 +246,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
         Supabase.instance.client.auth.currentUser?.userMetadata?['display_name']
             as String? ??
         '';
-    final initial =
-        username.isNotEmpty ? username[0].toUpperCase() : '?';
+    final initial = username.isNotEmpty ? username[0].toUpperCase() : '?';
 
     return PopupMenuButton<String>(
       tooltip: 'Account',
@@ -239,9 +263,13 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
                 children: const [
                   Icon(Icons.login_rounded, size: 18, color: _kAccent),
                   SizedBox(width: 10),
-                  Text('Login / Sign Up',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
+                  Text(
+                    'Login / Sign Up',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -265,8 +293,11 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
             value: 'profile',
             child: Row(
               children: const [
-                Icon(Icons.manage_accounts_outlined,
-                    size: 18, color: Colors.white70),
+                Icon(
+                  Icons.manage_accounts_outlined,
+                  size: 18,
+                  color: Colors.white70,
+                ),
                 SizedBox(width: 10),
                 Text('Profile', style: TextStyle(color: Colors.white)),
               ],
@@ -278,8 +309,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
               children: const [
                 Icon(Icons.bookmark_outline, size: 18, color: Colors.white70),
                 SizedBox(width: 10),
-                Text('Saved Articles',
-                    style: TextStyle(color: Colors.white)),
+                Text('Saved Articles', style: TextStyle(color: Colors.white)),
               ],
             ),
           ),
@@ -324,7 +354,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
     );
   }
 
-  // Build 
+  // Build
   @override
   Widget build(BuildContext context) {
     final activeCategory = widget.currentCategory ?? 'Home';
@@ -345,8 +375,11 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
               onTap: () => Navigator.pop(context),
               child: const Padding(
                 padding: EdgeInsets.all(6),
-                child: Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white70, size: 18),
+                child: Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: Colors.white70,
+                  size: 18,
+                ),
               ),
             ),
             const SizedBox(width: 8),
@@ -402,7 +435,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
         const SizedBox(width: 14),
       ],
 
-      // Category strip as PreferredSize bottom 
+      // Category strip as PreferredSize bottom
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(44),
         child: _buildCategoryStrip(activeCategory),
@@ -481,8 +514,11 @@ class _CategoryChipState extends State<_CategoryChip>
               borderRadius: BorderRadius.circular(20),
               border: Border(
                 bottom: BorderSide(
-                  color: Color.lerp(Colors.transparent, _kAccent,
-                      _underline.value)!,
+                  color: Color.lerp(
+                    Colors.transparent,
+                    _kAccent,
+                    _underline.value,
+                  )!,
                   width: 2,
                 ),
               ),
@@ -490,12 +526,9 @@ class _CategoryChipState extends State<_CategoryChip>
             child: Text(
               widget.label,
               style: TextStyle(
-                color: Color.lerp(
-                    _kTextMuted, _kTextActive, _underline.value),
+                color: Color.lerp(_kTextMuted, _kTextActive, _underline.value),
                 fontSize: 13,
-                fontWeight: widget.isActive
-                    ? FontWeight.w700
-                    : FontWeight.w500,
+                fontWeight: widget.isActive ? FontWeight.w700 : FontWeight.w500,
                 letterSpacing: 0.1,
               ),
             ),

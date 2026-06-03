@@ -39,13 +39,41 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   static const Color _muted = Color(0xFF6B7280);
 
   static const Map<String, _CategoryMeta> _categoryMeta = {
-    'business':    _CategoryMeta(Color(0xFF1A3A5C), Color(0xFF2D6EA8), Icons.business_center_outlined),
-    'entertainment': _CategoryMeta(Color(0xFF5C1A3A), Color(0xFFA82D6E), Icons.movie_filter_outlined),
-    'general':     _CategoryMeta(Color(0xFF1A1A2E), Color(0xFF3A3A6E), Icons.public_outlined),
-    'health':      _CategoryMeta(Color(0xFF1A5C2E), Color(0xFF2DA84B), Icons.favorite_outline),
-    'science':     _CategoryMeta(Color(0xFF3A1A5C), Color(0xFF6E2DA8), Icons.science_outlined),
-    'sports':      _CategoryMeta(Color(0xFF5C2E1A), Color(0xFFA84B2D), Icons.sports_soccer_outlined),
-    'technology':  _CategoryMeta(Color(0xFF0D3D3D), Color(0xFF0D7777), Icons.memory_outlined),
+    'business': _CategoryMeta(
+      Color(0xFF1A3A5C),
+      Color(0xFF2D6EA8),
+      Icons.business_center_outlined,
+    ),
+    'entertainment': _CategoryMeta(
+      Color(0xFF5C1A3A),
+      Color(0xFFA82D6E),
+      Icons.movie_filter_outlined,
+    ),
+    'general': _CategoryMeta(
+      Color(0xFF1A1A2E),
+      Color(0xFF3A3A6E),
+      Icons.public_outlined,
+    ),
+    'health': _CategoryMeta(
+      Color(0xFF1A5C2E),
+      Color(0xFF2DA84B),
+      Icons.favorite_outline,
+    ),
+    'science': _CategoryMeta(
+      Color(0xFF3A1A5C),
+      Color(0xFF6E2DA8),
+      Icons.science_outlined,
+    ),
+    'sports': _CategoryMeta(
+      Color(0xFF5C2E1A),
+      Color(0xFFA84B2D),
+      Icons.sports_soccer_outlined,
+    ),
+    'technology': _CategoryMeta(
+      Color(0xFF0D3D3D),
+      Color(0xFF0D7777),
+      Icons.memory_outlined,
+    ),
   };
 
   @override
@@ -123,8 +151,12 @@ class _NewsFeedPageState extends State<NewsFeedPage>
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Login Required'),
-            content: const Text('You need an account to load more articles. Please login or register to continue.'),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            content: const Text(
+              'You need an account to load more articles. Please login or register to continue.',
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -135,13 +167,17 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                   Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginRegisterPage()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginRegisterPage(),
+                    ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _ink,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 child: const Text('Login / Register'),
               ),
@@ -157,7 +193,11 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
     try {
       final nextPage = _currentPage + 1;
-      final moreArticles = await fetchCategory(_apiCategory, max: 10, page: nextPage);
+      final moreArticles = await fetchCategory(
+        _apiCategory,
+        max: 10,
+        page: nextPage,
+      );
       if (mounted && moreArticles.isNotEmpty) {
         setState(() {
           _generalArticles.addAll(moreArticles);
@@ -197,8 +237,12 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     _loadNews();
   }
 
-  // Shimmer skeleton 
-  Widget _buildShimmerBlock({double height = 20, double? width, double radius = 6}) {
+  // Shimmer skeleton
+  Widget _buildShimmerBlock({
+    double height = 20,
+    double? width,
+    double radius = 6,
+  }) {
     return AnimatedBuilder(
       animation: _shimmerController,
       builder: (_, __) {
@@ -228,10 +272,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: _buildShimmerBlock(
-          height: h > 800 ? 520 : h * 0.52,
-          radius: 20,
-        ),
+        child: _buildShimmerBlock(height: h > 800 ? 520 : h * 0.52, radius: 20),
       ),
     );
   }
@@ -274,7 +315,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     );
   }
 
-  // Section header 
+  // Section header
   Widget _buildSectionHeader(String label, {bool live = false}) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 6),
@@ -300,10 +341,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
               letterSpacing: -0.5,
             ),
           ),
-          if (live) ...[
-            const SizedBox(width: 10),
-            _LiveBadge(),
-          ],
+          if (live) ...[const SizedBox(width: 10), _LiveBadge()],
         ],
       ),
     );
@@ -312,7 +350,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   // Category Banner
   Widget _buildCategoryBanner(_CategoryMeta meta) {
     if (_currentCategoryTitle == 'Home') return const SizedBox.shrink();
-    
+
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 36, 24, 28),
       decoration: BoxDecoration(
@@ -351,10 +389,15 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                     letterSpacing: -0.5,
                   ),
                 ),
-                if (!_isGeneralLoading && _generalError == null && _generalArticles.isNotEmpty) ...[
+                if (!_isGeneralLoading &&
+                    _generalError == null &&
+                    _generalArticles.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(20),
@@ -380,11 +423,16 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
   @override
   Widget build(BuildContext context) {
-    final meta = _categoryMeta[_apiCategory.toLowerCase()] ??
-        const _CategoryMeta(Color(0xFF1A1A2E), Color(0xFF3A3A6E), Icons.article_outlined);
+    final meta =
+        _categoryMeta[_apiCategory.toLowerCase()] ??
+        const _CategoryMeta(
+          Color(0xFF1A1A2E),
+          Color(0xFF3A3A6E),
+          Icons.article_outlined,
+        );
 
-    final sectionTitle = _currentCategoryTitle == 'Home' 
-        ? 'Latest Headlines' 
+    final sectionTitle = _currentCategoryTitle == 'Home'
+        ? 'Latest Headlines'
         : '$_currentCategoryTitle Headlines';
 
     return Scaffold(
@@ -402,7 +450,6 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    
                     if (_currentCategoryTitle != 'Home')
                       _buildCategoryBanner(meta),
 
@@ -413,7 +460,9 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                       else if (_heroError != null)
                         Padding(
                           padding: const EdgeInsets.all(16),
-                          child: _ErrorBanner(message: 'Could not load top story.'),
+                          child: _ErrorBanner(
+                            message: 'Could not load top story.',
+                          ),
                         )
                       else if (_heroArticle != null)
                         HeroSectionWidget(newsItem: _heroArticle!)
@@ -421,7 +470,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                         const SizedBox.shrink(),
                     ],
 
-                    // LATEST HEADLINES 
+                    // LATEST HEADLINES
                     _buildSectionHeader(sectionTitle, live: true),
 
                     const _SectionDivider(),
@@ -434,11 +483,11 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                           shrinkWrap: true,
                           gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 450,
-                            mainAxisExtent: 310,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                          ),
+                                maxCrossAxisExtent: 450,
+                                mainAxisExtent: 310,
+                                crossAxisSpacing: 20,
+                                mainAxisSpacing: 20,
+                              ),
                           itemCount: 6,
                           itemBuilder: (_, __) => _buildCardSkeleton(),
                         ),
@@ -460,11 +509,11 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                           shrinkWrap: true,
                           gridDelegate:
                               const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 450,
-                            mainAxisExtent: 320,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                          ),
+                                maxCrossAxisExtent: 450,
+                                mainAxisExtent: 320,
+                                crossAxisSpacing: 20,
+                                mainAxisSpacing: 20,
+                              ),
                           itemCount: _generalArticles.length,
                           itemBuilder: (context, index) {
                             return NewsCardWidget(
@@ -475,9 +524,14 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                       ),
 
                     // Load More button
-                    if (!_isGeneralLoading && _generalError == null && _generalArticles.isNotEmpty)
+                    if (!_isGeneralLoading &&
+                        _generalError == null &&
+                        _generalArticles.isNotEmpty)
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 28,
+                        ),
                         child: Center(
                           child: SizedBox(
                             width: 220,
@@ -493,7 +547,10 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Icon(Icons.expand_more_rounded, size: 22),
+                                  : const Icon(
+                                      Icons.expand_more_rounded,
+                                      size: 22,
+                                    ),
                               label: Text(
                                 _isLoadingMore ? 'Loading...' : 'Load More',
                                 style: const TextStyle(
@@ -537,7 +594,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }
 }
 
-// Reusable helpers 
+// Reusable helpers
 
 class _LiveBadge extends StatefulWidget {
   @override
