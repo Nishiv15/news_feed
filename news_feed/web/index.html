@@ -18,19 +18,54 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Real-time curated news from 36+ countries with AI summaries.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="news_feed">
+  <meta name="apple-mobile-web-app-title" content="NewsFeed">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href=""/>
+  <link rel="icon" type="image/png" href="icons/Icon-192.png">
 
   <title>NewsFeed</title>
   <link rel="manifest" href="manifest.json">
+
+  <script>
+    // Capture the beforeinstallprompt event so Flutter/Dart can trigger it later.
+    // This fires on Android Chrome when the PWA install criteria are met.
+    window._pwaInstallPromptEvent = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window._pwaInstallPromptEvent = e;
+    });
+
+    // Called from Dart via JS interop to trigger the native install prompt
+    window.triggerPwaInstall = function() {
+      if (window._pwaInstallPromptEvent) {
+        window._pwaInstallPromptEvent.prompt();
+        window._pwaInstallPromptEvent.userChoice.then(function(choiceResult) {
+          window._pwaInstallPromptEvent = null;
+        });
+        return true;
+      }
+      return false;
+    };
+
+    // Called from Dart to check if a native prompt is available
+    window.hasPwaInstallPrompt = function() {
+      return window._pwaInstallPromptEvent != null;
+    };
+
+    // Check if already running as installed PWA
+    window.isRunningAsPwa = function() {
+      return window.matchMedia('(display-mode: standalone)').matches ||
+             window.navigator.standalone === true;
+    };
+  </script>
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>

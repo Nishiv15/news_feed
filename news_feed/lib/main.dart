@@ -4,6 +4,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './screens/HomePage.dart';
 import './screens/NewsFeedPage.dart';
 import './models/news_model.dart';
+import './widgets/install_app_banner_stub.dart'
+    if (dart.library.js_interop) './widgets/install_app_banner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -67,6 +69,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
+      builder: (context, child) {
+        return InstallAppBanner(child: child ?? const SizedBox.shrink());
+      },
       home: startPage,
     );
   }
