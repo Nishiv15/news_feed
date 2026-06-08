@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import './screens/HomePage.dart';
 import './screens/NewsFeedPage.dart';
 import './models/news_model.dart';
 import './widgets/install_app_banner_stub.dart'
-    if (dart.library.js_interop) './widgets/install_app_banner.dart';
+if (dart.library.js_interop) './widgets/install_app_banner.dart';
+
+const _supabaseUrl = 'https://pkbdqykzmjegdcvcllrs.supabase.co';
+const _supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBrYmRxeWt6bWplZ2RjdmNsbHJzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzOTU4MDIsImV4cCI6MjA5MDk3MTgwMn0._UdB1doC0fzB8QY2X3EihHT_Y-oNZfzLVoryW0HMCsw';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  final sUrl = dotenv.env['SUPABASE_URL']!
-      .replaceAll('"', '')
-      .replaceAll("'", "")
-      .trim();
-  final sKey = dotenv.env['SUPABASE_ANON_KEY']!
-      .replaceAll('"', '')
-      .replaceAll("'", "")
-      .trim();
 
-  await Supabase.initialize(url: sUrl, anonKey: sKey);
+  await Supabase.initialize(
+    url: _supabaseUrl,
+    anonKey: _supabaseAnonKey,
+  );
 
+  // Check for a persisted session and restore user state
   final session = Supabase.instance.client.auth.currentSession;
   Widget startPage = const HomePage();
 

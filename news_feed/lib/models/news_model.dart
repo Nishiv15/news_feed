@@ -1,18 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'secrets_service.dart';
 
-String apiKey = dotenv.env['apikey'] ?? '';
-String baseUrl = dotenv.env['baseurl'] ?? '';
-const int maxArticles = 10; 
+const int maxArticles = 10;
 
-String globalCountry = 'us'; // Default country is US
+String globalCountry = 'us';
 
 const String placeholderImageUrl =
     'https://placehold.co/600x400/CCCCCC/666666?text=Image+Unavailable';
-
-String corsProxyBaseUrl = dotenv.env['corsproxy'] ?? '';
 
 class NewsItem {
   final String title;
@@ -33,20 +28,17 @@ class NewsItem {
     required this.publishedAt,
   });
 
-  factory NewsItem.fromJson(Map<String, dynamic> json) {
+  static Future<NewsItem> fromJsonAsync(Map<String, dynamic> json) async {
+    final corsProxy = await SecretsService.corsProxy;
     String imageUrl = json['image'] ?? '';
 
     if (imageUrl.isEmpty || imageUrl == 'None') {
       imageUrl = placeholderImageUrl;
-    }
-    else if (!imageUrl.contains('placehold.co')) {
+    } else if (!imageUrl.contains('placehold.co')) {
       try {
         final encodedUrl = Uri.encodeComponent(imageUrl);
-        imageUrl = '$corsProxyBaseUrl$encodedUrl';
-      } catch (e) {
-        if (kDebugMode) {
-          print('Error processing URL for CORS proxy: $e');
-        }
+        imageUrl = '$corsProxy$encodedUrl';
+      } catch (_) {
         imageUrl = placeholderImageUrl;
       }
     }
@@ -56,7 +48,7 @@ class NewsItem {
       description: json['description'] ?? '',
       content: json['content'] ?? '',
       url: json['url'] ?? '#',
-      imageUrl: imageUrl, 
+      imageUrl: imageUrl,
       sourceName: json['source']?['name'] ?? 'Unknown Source',
       publishedAt:
           DateTime.tryParse(json['publishedAt'] ?? '') ?? DateTime.now(),
@@ -65,6 +57,11 @@ class NewsItem {
 }
 
 Future<NewsItem?> fetchHeroArticle() async {
+  final apiKey = await SecretsService.gnewsApiKey;
+  final baseUrl = await SecretsService.gnewsBaseUrl;
+
+  if (apiKey.isEmpty || baseUrl.isEmpty) return null;
+
   final url = Uri.parse(
     '${baseUrl}top-headlines?category=general&lang=en&country=$globalCountry&max=1&apikey=$apiKey',
   );
@@ -77,60 +74,43 @@ Future<NewsItem?> fetchHeroArticle() async {
       final articles = data['articles'] as List;
 
       if (articles.isNotEmpty) {
-        return NewsItem.fromJson(articles.first);
+        return await NewsItem.fromJsonAsync(articles.first);
       }
     } else {
-      if (kDebugMode) {
-        print('Hero API Request failed with status: ${response.statusCode}');
-        print('Response Body: ${response.body}');
-      }
       throw Exception(
         'Failed to load hero article: Status ${response.statusCode}',
       );
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Error during Hero API fetch: $e');
-    }
-  }
-  return null; 
+  } catch (_) {}
+  return null;
 }
 
-
 Future<List<NewsItem>> fetchCategory(String category, {int max = 10, int page = 1}) async {
+  final apiKey = await SecretsService.gnewsApiKey;
+  final baseUrl = await SecretsService.gnewsBaseUrl;
+
+  if (apiKey.isEmpty || baseUrl.isEmpty) return [];
+
   final url = Uri.parse(
     '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&page=$page&apikey=$apiKey',
   );
 
   try {
-    if (kDebugMode) {
-      print('Fetching articles for category: $category with max=$max');
-    }
-
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final articles = data['articles'] as List;
 
-      List<NewsItem> newsItems = articles
-          .map((json) => NewsItem.fromJson(json))
-          .toList();
+      final List<NewsItem> newsItems = await Future.wait(
+        articles.map((json) => NewsItem.fromJsonAsync(json)),
+      );
       return newsItems;
     } else {
-      if (kDebugMode) {
-        print(
-          'Category API Request failed for $category with status: ${response.statusCode}',
-        );
-      }
       throw Exception(
         'Failed to load $category news: Status ${response.statusCode}',
       );
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('Error during $category API fetch: $e');
-    }
-  }
+  } catch (_) {}
   return [];
 }
