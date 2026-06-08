@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'secrets_service.dart';
 
 const int maxArticles = 10;
@@ -56,67 +57,50 @@ class NewsItem {
   }
 }
 
+Future<Map<String, dynamic>?> _fetchViaEdgeFunction({
+  required String category,
+  required int max,
+  int page = 1,
+}) async {
+  try {
+    final response = await Supabase.instance.client.functions.invoke(
+      'fetch-news',
+      body: {
+        'category': category,
+        'country': globalCountry,
+        'max': max,
+        'page': page,
+      },
+    );
+    return response.data as Map<String, dynamic>?;
+  } catch (_) {
+    return null;
+  }
+}
+
 Future<NewsItem?> fetchHeroArticle() async {
-  final apiKey = await SecretsService.gnewsApiKey;
-  final baseUrl = await SecretsService.gnewsBaseUrl;
-  final corsProxy = await SecretsService.corsProxy;
-
-  if (apiKey.isEmpty || baseUrl.isEmpty) return null;
-
-  final gnewsUrl =
-      '${baseUrl}top-headlines?category=general&lang=en&country=$globalCountry&max=1&apikey=$apiKey';
-  final url = Uri.parse(
-    corsProxy.isNotEmpty ? '$corsProxy${Uri.encodeComponent(gnewsUrl)}' : gnewsUrl,
-  );
+  final data = await _fetchViaEdgeFunction(category: 'general', max: 1);
+  if (data == null) return null;
 
   try {
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final articles = data['articles'] as List;
-
-      if (articles.isNotEmpty) {
-        return await NewsItem.fromJsonAsync(articles.first);
-      }
-    } else {
-      throw Exception(
-        'Failed to load hero article: Status ${response.statusCode}',
-      );
+    final articles = data['articles'] as List;
+    if (articles.isNotEmpty) {
+      return await NewsItem.fromJsonAsync(articles.first);
     }
   } catch (_) {}
   return null;
 }
 
 Future<List<NewsItem>> fetchCategory(String category, {int max = 10, int page = 1}) async {
-  final apiKey = await SecretsService.gnewsApiKey;
-  final baseUrl = await SecretsService.gnewsBaseUrl;
-  final corsProxy = await SecretsService.corsProxy;
-
-  if (apiKey.isEmpty || baseUrl.isEmpty) return [];
-
-  final gnewsUrl =
-      '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&page=$page&apikey=$apiKey';
-  final url = Uri.parse(
-    corsProxy.isNotEmpty ? '$corsProxy${Uri.encodeComponent(gnewsUrl)}' : gnewsUrl,
-  );
+  final data = await _fetchViaEdgeFunction(category: category, max: max, page: page);
+  if (data == null) return [];
 
   try {
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final articles = data['articles'] as List;
-
-      final List<NewsItem> newsItems = await Future.wait(
-        articles.map((json) => NewsItem.fromJsonAsync(json)),
-      );
-      return newsItems;
-    } else {
-      throw Exception(
-        'Failed to load $category news: Status ${response.statusCode}',
-      );
-    }
+    final articles = data['articles'] as List;
+    final List<NewsItem> newsItems = await Future.wait(
+      articles.map((json) => NewsItem.fromJsonAsync(json as Map<String, dynamic>)),
+    );
+    return newsItems;
   } catch (_) {}
   return [];
 }
