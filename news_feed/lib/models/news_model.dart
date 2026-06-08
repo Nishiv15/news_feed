@@ -59,11 +59,14 @@ class NewsItem {
 Future<NewsItem?> fetchHeroArticle() async {
   final apiKey = await SecretsService.gnewsApiKey;
   final baseUrl = await SecretsService.gnewsBaseUrl;
+  final corsProxy = await SecretsService.corsProxy;
 
   if (apiKey.isEmpty || baseUrl.isEmpty) return null;
 
+  final gnewsUrl =
+      '${baseUrl}top-headlines?category=general&lang=en&country=$globalCountry&max=1&apikey=$apiKey';
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=general&lang=en&country=$globalCountry&max=1&apikey=$apiKey',
+    corsProxy.isNotEmpty ? '$corsProxy${Uri.encodeComponent(gnewsUrl)}' : gnewsUrl,
   );
 
   try {
@@ -88,11 +91,14 @@ Future<NewsItem?> fetchHeroArticle() async {
 Future<List<NewsItem>> fetchCategory(String category, {int max = 10, int page = 1}) async {
   final apiKey = await SecretsService.gnewsApiKey;
   final baseUrl = await SecretsService.gnewsBaseUrl;
+  final corsProxy = await SecretsService.corsProxy;
 
   if (apiKey.isEmpty || baseUrl.isEmpty) return [];
 
+  final gnewsUrl =
+      '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&page=$page&apikey=$apiKey';
   final url = Uri.parse(
-    '${baseUrl}top-headlines?category=$category&lang=en&country=$globalCountry&max=$max&page=$page&apikey=$apiKey',
+    corsProxy.isNotEmpty ? '$corsProxy${Uri.encodeComponent(gnewsUrl)}' : gnewsUrl,
   );
 
   try {
