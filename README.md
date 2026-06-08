@@ -2,6 +2,8 @@
 
 A premium cross-platform Flutter application providing highly curated, real-time localized news articles powered by an intelligent AI integration.
 
+Website: https://newsfeed-ai.vercel.app/
+
 ---
 
 ## 🛑 The Problem
