@@ -14,7 +14,7 @@ class GeminiService {
     }
 
     final model = GenerativeModel(
-      model: 'gemini-3.5-flash',
+      model: 'gemini-3.1-flash-lite',
       apiKey: apiKey,
     );
 
