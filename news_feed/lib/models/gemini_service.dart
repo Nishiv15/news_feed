@@ -20,7 +20,7 @@ class GeminiService {
 
     final prompt =
         'Summarize this news article based on the title and description '
-        'in a brief description of 100-150 words:\n'
+        'in a brief description of 75-100 words:\n'
         'Title: $title\n'
         'Description: $description';
 
