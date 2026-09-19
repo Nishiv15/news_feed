@@ -203,7 +203,7 @@ class _StatsStrip extends StatelessWidget {
   const _StatsStrip({required this.ink, required this.accent});
 
   static const _stats = [
-    ('36+', 'Countries'),
+    ('10+', 'Countries'),
     ('7', 'Categories'),
     ('AI', 'Summaries'),
     ('∞', 'Headlines'),

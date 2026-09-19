@@ -113,14 +113,14 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4F6),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFF12121F),
         elevation: 1,
         centerTitle: false,
-        iconTheme: const IconThemeData(color: Color(0xFF1A1A2E)),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           'NewsFeed',
           style: TextStyle(
-            color: Color(0xFF1A1A2E),
+            color: Colors.white,
             fontSize: 24,
             fontWeight: FontWeight.w900,
           ),
