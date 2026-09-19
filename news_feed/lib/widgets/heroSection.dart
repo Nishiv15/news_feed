@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/news_model.dart';
 import 'ai_summary_panel.dart';
 import '../models/supabase_auth_service.dart';
+import '../screens/ArticlePage.dart';
 
 class HeroSectionWidget extends StatefulWidget {
   final NewsItem newsItem;
@@ -65,15 +66,13 @@ class _HeroSectionWidgetState extends State<HeroSectionWidget> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: InkWell(
-        onTap: () async {
-          final url = Uri.parse(widget.newsItem.url);
-          if (await canLaunchUrl(url)) {
-            await launchUrl(url, mode: LaunchMode.externalApplication);
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Could not open article link: ${widget.newsItem.url}')),
-            );
-          }
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ArticlePage(article: widget.newsItem),
+            ),
+          );
         },
         child: Container(
           height: 600,
