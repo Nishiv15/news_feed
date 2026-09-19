@@ -4,6 +4,7 @@ import '../models/news_model.dart';
 import 'package:intl/intl.dart';
 import 'ai_summary_panel.dart';
 import '../models/supabase_auth_service.dart';
+import '../screens/ArticlePage.dart';
 
 class NewsCardWidget extends StatefulWidget {
   final NewsItem article;
@@ -65,15 +66,13 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () async {
-        final url = Uri.parse(widget.article.url);
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not open article link: ${widget.article.url}')),
-          );
-        }
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArticlePage(article: widget.article),
+          ),
+        );
       },
       child: Container(
         width: 300,
@@ -137,9 +136,9 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                     ),
                     child: IconButton(
                       icon: Icon(
-                        _isSaved ? Icons.favorite : Icons.favorite_border,
-                        color: _isSaved ? Colors.red : Colors.white,
-                        size: 22,
+                        _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                        color: _isSaved ? const Color(0xFFD6472B) : Colors.white,
+                        size: 24,
                       ),
                       tooltip: _isSaved ? 'Remove Bookmark' : 'Save Article',
                       onPressed: _toggleSave,
