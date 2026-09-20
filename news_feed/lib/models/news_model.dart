@@ -104,3 +104,86 @@ Future<List<NewsItem>> fetchCategory(String category, {int max = 10, int page = 
   } catch (_) {}
   return [];
 }
+
+class SearchResult {
+  final List<NewsItem> articles;
+  final int totalArticles;
+
+  SearchResult({required this.articles, required this.totalArticles});
+}
+
+Future<SearchResult> searchNewsWithResult(String query, {int max = 10, int page = 1}) async {
+  final cleanQuery = query.trim();
+  if (cleanQuery.isEmpty) return SearchResult(articles: [], totalArticles: 0);
+
+  // 1. Attempt edge function with search query parameter
+  try {
+    final response = await Supabase.instance.client.functions.invoke(
+      'fetch-news',
+      body: {
+        'q': cleanQuery,
+        'query': cleanQuery,
+        'country': globalCountry,
+        'max': max,
+        'page': page,
+      },
+    );
+    final data = response.data as Map<String, dynamic>?;
+    if (data != null && data['articles'] is List) {
+      final articlesList = data['articles'] as List;
+      final total = (data['totalArticles'] ?? data['totalResults'] ?? articlesList.length) as int;
+      final List<NewsItem> newsItems = await Future.wait(
+        articlesList.map((json) => NewsItem.fromJsonAsync(json as Map<String, dynamic>)),
+      );
+      return SearchResult(articles: newsItems, totalArticles: total);
+    }
+  } catch (_) {}
+
+  // 2. Fallback to direct GNews API search if edge function doesn't return articles
+  try {
+    final apiKey = await SecretsService.gnewsApiKey;
+    final baseUrl = await SecretsService.gnewsBaseUrl;
+    if (apiKey.isNotEmpty) {
+      final rootUrl = baseUrl.isNotEmpty
+          ? baseUrl.replaceAll(RegExp(r'/(top-headlines|search)\??.*$'), '')
+          : 'https://gnews.io/api/v4';
+      final searchUri = Uri.parse(
+        '$rootUrl/search?q=${Uri.encodeComponent(cleanQuery)}&country=$globalCountry&max=$max&page=$page&apikey=$apiKey',
+      );
+      final response = await http.get(searchUri);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        if (data['articles'] is List) {
+          final articlesList = data['articles'] as List;
+          final total = (data['totalArticles'] ?? data['totalResults'] ?? articlesList.length) as int;
+          final List<NewsItem> newsItems = await Future.wait(
+            articlesList.map((json) => NewsItem.fromJsonAsync(json as Map<String, dynamic>)),
+          );
+          return SearchResult(articles: newsItems, totalArticles: total);
+        }
+      }
+    }
+  } catch (_) {}
+
+  // 3. Fallback: filter general category articles locally
+  try {
+    final generalArticles = await fetchCategory('general', max: 30);
+    final lowerQuery = cleanQuery.toLowerCase();
+    final matched = generalArticles.where((article) {
+      return article.title.toLowerCase().contains(lowerQuery) ||
+          article.description.toLowerCase().contains(lowerQuery) ||
+          article.content.toLowerCase().contains(lowerQuery) ||
+          article.sourceName.toLowerCase().contains(lowerQuery);
+    }).toList();
+    return SearchResult(articles: matched, totalArticles: matched.length);
+  } catch (_) {}
+
+  return SearchResult(articles: [], totalArticles: 0);
+}
+
+Future<List<NewsItem>> searchNews(String query, {int max = 10, int page = 1}) async {
+  final result = await searchNewsWithResult(query, max: max, page: page);
+  return result.articles;
+}
+
+
