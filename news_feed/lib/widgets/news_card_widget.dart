@@ -65,6 +65,8 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -77,7 +79,7 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
           borderRadius: BorderRadius.circular(12.0),
           boxShadow: [
             BoxShadow(
@@ -105,16 +107,16 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey[200],
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, color: Colors.grey, size: 40),
+                          color: isDark ? const Color(0xFF2A2A3E) : Colors.grey[200],
+                          child: Center(
+                            child: Icon(Icons.image_not_supported, color: isDark ? Colors.white54 : Colors.grey, size: 40),
                           ),
                         );
                       },
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return Container(
-                          color: Colors.grey[200],
+                          color: isDark ? const Color(0xFF2A2A3E) : Colors.grey[200],
                           child: const Center(
                             child: CircularProgressIndicator(strokeWidth: 2.0),
                           ),
@@ -124,7 +126,7 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                   ),
                 ),
                 
-                // Saved Heart Marker (Top Left)
+                // Saved Bookmark Marker (Top Left)
                 Positioned(
                   top: 8,
                   left: 8,
@@ -172,10 +174,11 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                 children: [
                   Text(
                     widget.article.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                       height: 1.3,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -188,7 +191,7 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                         child: Text(
                           widget.article.sourceName,
                           style: TextStyle(
-                            color: Colors.blueGrey[700],
+                            color: isDark ? Colors.blueGrey[200] : Colors.blueGrey[700],
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                           ),
@@ -198,7 +201,7 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
                       Text(
                         DateFormat('MMM dd').format(widget.article.publishedAt),
                         style: TextStyle(
-                          color: Colors.grey[600],
+                          color: isDark ? Colors.grey[400] : Colors.grey[600],
                           fontSize: 12,
                         ),
                       ),

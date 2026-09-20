@@ -515,7 +515,7 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: -0.3,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ],

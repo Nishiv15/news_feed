@@ -29,14 +29,16 @@ class ArticlePage extends StatelessWidget {
   }
 
   static const Color _bg = Color(0xFFF7F4EF);
+  static const Color _bgDark = Color(0xFF121218);
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final screenWidth = MediaQuery.of(context).size.width;
     final horizontalPadding = screenWidth < 600 ? 14.0 : 24.0;
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: isDark ? _bgDark : _bg,
       appBar: const NewsFeedNavBar(),
       body: CustomScrollView(
         slivers: [
@@ -62,7 +64,10 @@ class ArticlePage extends StatelessWidget {
 
                       const SizedBox(height: 32),
 
-                      const Divider(color: Color(0xFFDDD8D0), height: 1),
+                      Divider(
+                        color: isDark ? const Color(0xFF2C2C3E) : const Color(0xFFDDD8D0),
+                        height: 1,
+                      ),
 
                       const SizedBox(height: 32),
 
