@@ -318,7 +318,8 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }) {
     return AnimatedBuilder(
       animation: _shimmerController,
-      builder: (_, __) {
+      builder: (context, __) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Container(
           height: height,
           width: width,
@@ -327,11 +328,17 @@ class _NewsFeedPageState extends State<NewsFeedPage>
             gradient: LinearGradient(
               begin: Alignment(-1.5 + _shimmerController.value * 3, 0),
               end: Alignment(0.5 + _shimmerController.value * 3, 0),
-              colors: const [
-                Color(0xFFE0DDD8),
-                Color(0xFFF0ECE6),
-                Color(0xFFE0DDD8),
-              ],
+              colors: isDark
+                  ? const [
+                      Color(0xFF2A2A3E),
+                      Color(0xFF3A3A4E),
+                      Color(0xFF2A2A3E),
+                    ]
+                  : const [
+                      Color(0xFFE0DDD8),
+                      Color(0xFFF0ECE6),
+                      Color(0xFFE0DDD8),
+                    ],
             ),
           ),
         );
@@ -351,9 +358,10 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }
 
   Widget _buildCardSkeleton() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -390,6 +398,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
   // Section header
   Widget _buildSectionHeader(String label, {bool live = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 32, 16, 6),
       child: Row(
@@ -406,11 +415,11 @@ class _NewsFeedPageState extends State<NewsFeedPage>
           const SizedBox(width: 10),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Georgia',
               fontSize: 26,
               fontWeight: FontWeight.w900,
-              color: _ink,
+              color: isDark ? Colors.white : _ink,
               letterSpacing: -0.5,
             ),
           ),
@@ -567,6 +576,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final meta =
         _categoryMeta[_apiCategory.toLowerCase()] ??
         const _CategoryMeta(
@@ -589,7 +599,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
         onSearchSubmitted: _performSearch,
         onClearSearch: _clearSearch,
       ),
-      backgroundColor: _bg,
+      backgroundColor: isDark ? const Color(0xFF121218) : _bg,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -652,9 +662,9 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                                 padding: const EdgeInsets.all(32),
                                 margin: const EdgeInsets.symmetric(vertical: 16),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
                                   borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: const Color(0xFFE0DDD8)),
+                                  border: Border.all(color: isDark ? const Color(0xFF2C2C3E) : const Color(0xFFE0DDD8)),
                                 ),
                                 child: Column(
                                   children: [
@@ -666,19 +676,19 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                                     const SizedBox(height: 16),
                                     Text(
                                       'No articles found for "$_searchQuery"',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
-                                        color: _ink,
+                                        color: isDark ? Colors.white : _ink,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),
                                     const SizedBox(height: 8),
-                                    const Text(
+                                    Text(
                                       'Try searching with different keywords like "Technology", "AI", or "Sports".',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: _muted,
+                                        color: isDark ? Colors.white70 : _muted,
                                       ),
                                       textAlign: TextAlign.center,
                                     ),

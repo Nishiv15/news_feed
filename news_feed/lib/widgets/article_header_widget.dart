@@ -79,6 +79,7 @@ class _ArticleHeaderWidgetState extends State<ArticleHeaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final formattedDate =
         DateFormat('MMM d, yyyy • h:mm a').format(widget.article.publishedAt);
 
@@ -125,16 +126,16 @@ class _ArticleHeaderWidgetState extends State<ArticleHeaderWidget> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.schedule_rounded,
                   size: 14,
-                  color: Color(0xFF6B7280),
+                  color: isDark ? Colors.white70 : const Color(0xFF6B7280),
                 ),
                 const SizedBox(width: 4),
                 Text(
                   formattedDate,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : const Color(0xFF6B7280),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -158,21 +159,21 @@ class _ArticleHeaderWidgetState extends State<ArticleHeaderWidget> {
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: const Color(0xFFE5E7EB),
-                      child: const Center(
+                      color: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFE5E7EB),
+                      child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
                               Icons.image_not_supported_outlined,
                               size: 48,
-                              color: Color(0xFF9CA3AF),
+                              color: isDark ? Colors.white54 : const Color(0xFF9CA3AF),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               'Image unavailable',
                               style: TextStyle(
-                                color: Color(0xFF6B7280),
+                                color: isDark ? Colors.white54 : const Color(0xFF6B7280),
                                 fontSize: 13,
                               ),
                             ),
@@ -184,7 +185,7 @@ class _ArticleHeaderWidgetState extends State<ArticleHeaderWidget> {
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(
-                      color: const Color(0xFFF3F4F6),
+                      color: isDark ? const Color(0xFF1E1E2E) : const Color(0xFFF3F4F6),
                       child: const Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,

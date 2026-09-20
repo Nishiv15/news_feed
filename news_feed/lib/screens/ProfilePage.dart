@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/supabase_auth_service.dart';
 import '../models/news_model.dart';
+import '../models/theme_notifier.dart';
 import '../widgets/NewsFeedNavbar.dart';
 import '../widgets/NewsFeedFooter.dart';
 import '../screens/HomePage.dart';
@@ -128,6 +129,7 @@ class _ProfilePageState extends State<ProfilePage> {
     // Reset state each time the sheet opens
     _obscurePassword = true;
     _obscureConfirmPassword = true;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
@@ -137,9 +139,9 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (sheetContext, setSheetState) => Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
             child: Form(
@@ -152,31 +154,32 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Container(
                       width: 40, height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
+                        color: isDark ? Colors.grey[700] : Colors.grey[300],
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text('Change Password',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1A1A2E))),
+                  Text('Change Password',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1A1A2E))),
                   const SizedBox(height: 4),
                   Text('Enter a new password for your account.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+                    style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey[600])),
                   const SizedBox(height: 24),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
                     decoration: InputDecoration(
                       labelText: 'New Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      prefixIcon: Icon(Icons.lock_outline, color: isDark ? Colors.white : null),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: isDark ? Colors.white70 : null),
                         onPressed: () => setSheetState(() => _obscurePassword = !_obscurePassword),
                       ),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
-                      fillColor: const Color(0xFFF8F9FA),
+                      fillColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF8F9FA),
                     ),
                     validator: (v) => (v == null || v.length < 6) ? 'Minimum 6 characters' : null,
                   ),
@@ -184,16 +187,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black),
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
-                      prefixIcon: const Icon(Icons.lock_outline),
+                      prefixIcon: Icon(Icons.lock_outline, color: isDark ? Colors.white : null),
                       suffixIcon: IconButton(
-                        icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility, color: isDark ? Colors.white70 : null),
                         onPressed: () => setSheetState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       filled: true,
-                      fillColor: const Color(0xFFF8F9FA),
+                      fillColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF8F9FA),
                     ),
                     validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
                   ),
@@ -226,23 +230,25 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
   void _showDeleteConfirmation() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1E1E2E) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(children: [
           const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
           const SizedBox(width: 10),
-          const Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          Text('Delete Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : Colors.black)),
         ]),
-        content: const Text(
+        content: Text(
           'Are you sure? This will permanently deactivate your account and erase all saved articles. This action cannot be undone.',
-          style: TextStyle(height: 1.5),
+          style: TextStyle(height: 1.5, color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600)),
+            child: Text('Cancel', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton(
             onPressed: () { Navigator.pop(ctx); _deleteAccount(); },
@@ -262,9 +268,10 @@ class _ProfilePageState extends State<ProfilePage> {
     final countryName = countryMap.entries
         .firstWhere((e) => e.value == _selectedCountry, orElse: () => const MapEntry('Unknown', ''))
         .key;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: isDark ? const Color(0xFF121218) : const Color(0xFFF3F4F6),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -332,7 +339,55 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      _SectionHeader(title: 'Account Information'),
+                      // SECTION: APPEARANCE PREFERENCE
+                      const _SectionHeader(title: 'Appearance'),
+                      const SizedBox(height: 8),
+                      _SettingsCard(
+                        children: [
+                          ValueListenableBuilder<ThemeMode>(
+                            valueListenable: themeNotifier,
+                            builder: (context, mode, child) {
+                              final darkModeActive = mode == ThemeMode.dark;
+                              return SwitchListTile.adaptive(
+                                contentPadding: EdgeInsets.zero,
+                                secondary: Container(
+                                  width: 36, height: 36,
+                                  decoration: BoxDecoration(
+                                    color: (darkModeActive ? Colors.white : const Color(0xFF0F3460)).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    darkModeActive ? Icons.dark_mode_outlined : Icons.light_mode_outlined,
+                                    size: 18,
+                                    color: darkModeActive ? Colors.white : const Color(0xFF0F3460),
+                                  ),
+                                ),
+                                title: Text(
+                                  'Dark Mode',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Switch between light and dark UI themes',
+                                  style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey[600]),
+                                ),
+                                value: darkModeActive,
+                                activeColor: const Color(0xFFD6472B),
+                                onChanged: (val) {
+                                  themeNotifier.toggleTheme(val);
+                                },
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 28),
+
+                      const _SectionHeader(title: 'Account Information'),
                       const SizedBox(height: 8),
                       _SettingsCard(
                         children: [
@@ -342,12 +397,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 TextFormField(
                                   controller: _usernameController,
+                                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
                                   decoration: InputDecoration(
                                     labelText: 'Display Name',
-                                    prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF0F3460)),
+                                    prefixIcon: Icon(Icons.person_outline, color: isDark ? Colors.white : const Color(0xFF0F3460)),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                     filled: true,
-                                    fillColor: const Color(0xFFF8F9FA),
+                                    fillColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF8F9FA),
                                   ),
                                   validator: (v) => (v == null || v.trim().isEmpty)
                                       ? 'Name cannot be empty' : null,
@@ -355,15 +411,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(height: 16),
                                 DropdownButtonFormField<String>(
                                   value: _selectedCountry,
+                                  dropdownColor: isDark ? const Color(0xFF1E1E2E) : Colors.white,
+                                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
                                   decoration: InputDecoration(
                                     labelText: 'Preferred Country',
-                                    prefixIcon: const Icon(Icons.public, color: Color(0xFF0F3460)),
+                                    prefixIcon: Icon(Icons.public, color: isDark ? Colors.white : const Color(0xFF0F3460)),
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                     filled: true,
-                                    fillColor: const Color(0xFFF8F9FA),
+                                    fillColor: isDark ? const Color(0xFF2A2A3E) : const Color(0xFFF8F9FA),
                                   ),
                                   items: countryMap.entries.map((e) =>
-                                    DropdownMenuItem(value: e.value, child: Text(e.key))
+                                    DropdownMenuItem(
+                                      value: e.value,
+                                      child: Text(e.key, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                                    )
                                   ).toList(),
                                   onChanged: (v) { if (v != null) setState(() => _selectedCountry = v); },
                                 ),
@@ -394,18 +455,18 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 28),
 
                       // QUICK INFO TILES
-                      _SectionHeader(title: 'Details'),
+                      const _SectionHeader(title: 'Details'),
                       const SizedBox(height: 8),
                       _SettingsCard(children: [
                         _InfoTile(icon: Icons.email_outlined, label: 'Email', value: _email),
-                        const Divider(height: 1, indent: 56),
+                        Divider(height: 1, indent: 56, color: isDark ? const Color(0xFF2A2A3E) : Colors.grey[200]),
                         _InfoTile(icon: Icons.flag_outlined, label: 'Country', value: countryName),
                       ]),
 
                       const SizedBox(height: 28),
 
                       // SECTION: SECURITY 
-                      _SectionHeader(title: 'Security'),
+                      const _SectionHeader(title: 'Security'),
                       const SizedBox(height: 8),
                       _SettingsCard(children: [
                         _ActionTile(
@@ -414,14 +475,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           label: 'Change Password',
                           subtitle: 'Update your account password',
                           onTap: _showChangePasswordSheet,
-                          trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                          trailing: Icon(Icons.chevron_right, color: isDark ? Colors.white70 : Colors.grey),
                         ),
                       ]),
 
                       const SizedBox(height: 28),
 
                       // SECTION: DANGER ZONE
-                      _SectionHeader(title: 'Danger Zone'),
+                      const _SectionHeader(title: 'Danger Zone'),
                       const SizedBox(height: 8),
                       _SettingsCard(children: [
                         _ActionTile(
@@ -486,18 +547,24 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: children,
+      child: Material(
+        color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: children,
+          ),
+        ),
       ),
     );
   }
@@ -511,6 +578,7 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
@@ -518,18 +586,18 @@ class _InfoTile extends StatelessWidget {
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF1A1A2E).withOpacity(0.07),
+              color: isDark ? Colors.white.withOpacity(0.1) : const Color(0xFF1A1A2E).withOpacity(0.07),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 18, color: const Color(0xFF0F3460)),
+            child: Icon(icon, size: 18, color: isDark ? Colors.white : const Color(0xFF0F3460)),
           ),
           const SizedBox(width: 16),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500], fontWeight: FontWeight.w500)),
+              Text(label, style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey[500], fontWeight: FontWeight.w500)),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF1A1A2E))),
+              Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1A1A2E))),
             ],
           ),
         ],
@@ -545,7 +613,7 @@ class _ActionTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback? onTap;
   final Widget trailing;
-  final Color labelColor;
+  final Color? labelColor;
 
   const _ActionTile({
     required this.icon,
@@ -554,11 +622,15 @@ class _ActionTile extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     required this.trailing,
-    this.labelColor = const Color(0xFF1A1A2E),
+    this.labelColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final effectiveIconColor = (isDark && iconColor != Colors.red) ? Colors.white : iconColor;
+    final effectiveLabelColor = labelColor ?? (isDark ? Colors.white : const Color(0xFF1A1A2E));
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -569,19 +641,19 @@ class _ActionTile extends StatelessWidget {
             Container(
               width: 36, height: 36,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
+                color: effectiveIconColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(icon, size: 18, color: iconColor),
+              child: Icon(icon, size: 18, color: effectiveIconColor),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: labelColor)),
+                  Text(label, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: effectiveLabelColor)),
                   const SizedBox(height: 2),
-                  Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey[500])),
                 ],
               ),
             ),
