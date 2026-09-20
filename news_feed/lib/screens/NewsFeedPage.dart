@@ -9,7 +9,12 @@ import 'LoginRegisterPage.dart';
 
 class NewsFeedPage extends StatefulWidget {
   final String? initialCategoryTitle;
-  const NewsFeedPage({super.key, this.initialCategoryTitle});
+  final String? initialSearchQuery;
+  const NewsFeedPage({
+    super.key,
+    this.initialCategoryTitle,
+    this.initialSearchQuery,
+  });
 
   @override
   State<NewsFeedPage> createState() => _NewsFeedPageState();
@@ -27,6 +32,8 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
   String _currentCategoryTitle = 'Home';
   String _apiCategory = 'general';
+  String? _searchQuery;
+  int? _totalSearchArticles;
 
   int _currentPage = 1;
   bool _isLoadingMore = false;
@@ -79,19 +86,79 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   @override
   void initState() {
     super.initState();
-    _currentCategoryTitle = widget.initialCategoryTitle ?? 'Home';
+    _searchQuery = widget.initialSearchQuery;
+    if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+      _currentCategoryTitle = 'Search';
+    } else {
+      _currentCategoryTitle = widget.initialCategoryTitle ?? 'Home';
+    }
     _apiCategory = categoryMap[_currentCategoryTitle] ?? 'general';
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     )..repeat();
-    _loadNews();
+
+    if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+      _performSearch(_searchQuery!);
+    } else {
+      _loadNews();
+    }
   }
 
   @override
   void dispose() {
     _shimmerController.dispose();
     super.dispose();
+  }
+
+  Future<void> _performSearch(String query) async {
+    final cleanQuery = query.trim();
+    if (cleanQuery.isEmpty) return;
+
+    setState(() {
+      _searchQuery = cleanQuery;
+      _currentCategoryTitle = 'Search';
+      _isGeneralLoading = true;
+      _generalError = null;
+      _generalArticles.clear();
+      _totalSearchArticles = null;
+      _heroArticle = null;
+      _isHeroLoading = false;
+      _currentPage = 1;
+    });
+
+    try {
+      final result = await searchNewsWithResult(cleanQuery, max: 10);
+      if (mounted) {
+        setState(() {
+          _generalArticles = result.articles;
+          _totalSearchArticles = result.totalArticles;
+          _isGeneralLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _generalError = e.toString();
+          _isGeneralLoading = false;
+        });
+      }
+    }
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchQuery = null;
+      _totalSearchArticles = null;
+      _currentCategoryTitle = 'Home';
+      _apiCategory = 'general';
+      _isGeneralLoading = true;
+      _isHeroLoading = true;
+      _generalError = null;
+      _generalArticles.clear();
+      _currentPage = 1;
+    });
+    _loadNews();
   }
 
   Future<void> _loadNews() async {
@@ -193,11 +260,16 @@ class _NewsFeedPageState extends State<NewsFeedPage>
 
     try {
       final nextPage = _currentPage + 1;
-      final moreArticles = await fetchCategory(
-        _apiCategory,
-        max: 10,
-        page: nextPage,
-      );
+      final List<NewsItem> moreArticles;
+      if (_searchQuery != null && _searchQuery!.isNotEmpty) {
+        moreArticles = await searchNews(_searchQuery!, max: 10, page: nextPage);
+      } else {
+        moreArticles = await fetchCategory(
+          _apiCategory,
+          max: 10,
+          page: nextPage,
+        );
+      }
       if (mounted && moreArticles.isNotEmpty) {
         setState(() {
           _generalArticles.addAll(moreArticles);
@@ -219,9 +291,10 @@ class _NewsFeedPageState extends State<NewsFeedPage>
   }
 
   void _onCategorySelected(String categoryKey) {
-    if (_currentCategoryTitle == categoryKey) return;
+    if (_currentCategoryTitle == categoryKey && _searchQuery == null) return;
 
     setState(() {
+      _searchQuery = null;
       _currentCategoryTitle = categoryKey;
       _apiCategory = categoryMap[categoryKey] ?? 'general';
       _isGeneralLoading = true;
@@ -347,6 +420,77 @@ class _NewsFeedPageState extends State<NewsFeedPage>
     );
   }
 
+  Widget _buildSearchBanner() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: _ink,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _accent.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.search_rounded, color: _accent, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'SEARCH RESULTS',
+                  style: TextStyle(
+                    color: Color(0xFF8A8FA8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '"$_searchQuery"',
+                  style: const TextStyle(
+                    fontFamily: 'Georgia',
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (!_isGeneralLoading && _generalError == null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_totalSearchArticles ?? _generalArticles.length} article${(_totalSearchArticles ?? _generalArticles.length) == 1 ? '' : 's'} found',
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'Clear search',
+            icon: const Icon(Icons.close_rounded, color: Colors.white70),
+            onPressed: _clearSearch,
+          ),
+        ],
+      ),
+    );
+  }
+
   // Category Banner
   Widget _buildCategoryBanner(_CategoryMeta meta) {
     if (_currentCategoryTitle == 'Home') return const SizedBox.shrink();
@@ -431,14 +575,19 @@ class _NewsFeedPageState extends State<NewsFeedPage>
           Icons.article_outlined,
         );
 
-    final sectionTitle = _currentCategoryTitle == 'Home'
-        ? 'Latest Headlines'
-        : '$_currentCategoryTitle Headlines';
+    final sectionTitle = _searchQuery != null && _searchQuery!.isNotEmpty
+        ? 'Search Results'
+        : (_currentCategoryTitle == 'Home'
+            ? 'Latest Headlines'
+            : '$_currentCategoryTitle Headlines');
 
     return Scaffold(
       appBar: NewsFeedNavBar(
         currentCategory: _currentCategoryTitle,
         onCategorySelected: _onCategorySelected,
+        searchQuery: _searchQuery,
+        onSearchSubmitted: _performSearch,
+        onClearSearch: _clearSearch,
       ),
       backgroundColor: _bg,
       body: CustomScrollView(
@@ -450,10 +599,13 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    if (_currentCategoryTitle != 'Home')
+                    if (_searchQuery != null && _searchQuery!.isNotEmpty)
+                      _buildSearchBanner()
+                    else if (_currentCategoryTitle != 'Home')
                       _buildCategoryBanner(meta),
 
-                    if (_currentCategoryTitle == 'Home') ...[
+                    if (_currentCategoryTitle == 'Home' &&
+                        (_searchQuery == null || _searchQuery!.isEmpty)) ...[
                       const SizedBox(height: 20),
                       if (_isHeroLoading)
                         _buildHeroSkeleton(context)
@@ -470,8 +622,8 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                         const SizedBox.shrink(),
                     ],
 
-                    // LATEST HEADLINES
-                    _buildSectionHeader(sectionTitle, live: true),
+                    // LATEST HEADLINES / SEARCH RESULTS
+                    _buildSectionHeader(sectionTitle, live: _searchQuery == null || _searchQuery!.isEmpty),
 
                     const _SectionDivider(),
 
@@ -495,11 +647,62 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                     else if (_generalError != null || _generalArticles.isEmpty)
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: _ErrorBanner(
-                          message: _generalError != null
-                              ? 'Error fetching headlines: $_generalError'
-                              : 'No articles available right now.',
-                        ),
+                        child: _searchQuery != null && _searchQuery!.isNotEmpty
+                            ? Container(
+                                padding: const EdgeInsets.all(32),
+                                margin: const EdgeInsets.symmetric(vertical: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: const Color(0xFFE0DDD8)),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const Icon(
+                                      Icons.search_off_rounded,
+                                      size: 56,
+                                      color: Color(0xFF8A8FA8),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'No articles found for "$_searchQuery"',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: _ink,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Text(
+                                      'Try searching with different keywords like "Technology", "AI", or "Sports".',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: _muted,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    ElevatedButton.icon(
+                                      onPressed: _clearSearch,
+                                      icon: const Icon(Icons.refresh_rounded, size: 18),
+                                      label: const Text('Clear Search & View Headlines'),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: _accent,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : _ErrorBanner(
+                                message: _generalError != null
+                                    ? 'Error fetching headlines: $_generalError'
+                                    : 'No articles available right now.',
+                              ),
                       )
                     else
                       Padding(
@@ -522,6 +725,7 @@ class _NewsFeedPageState extends State<NewsFeedPage>
                           },
                         ),
                       ),
+
 
                     // Load More button
                     if (!_isGeneralLoading &&

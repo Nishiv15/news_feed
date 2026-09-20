@@ -75,8 +75,7 @@ class _NewsCardWidgetState extends State<NewsCardWidget> {
         );
       },
       child: Container(
-        width: 300,
-        margin: const EdgeInsets.only(right: 15),
+        width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.0),

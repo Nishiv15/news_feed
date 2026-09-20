@@ -42,11 +42,17 @@ const _kDivider = Color(0xFF2A2A3E);
 class NewsFeedNavBar extends StatefulWidget implements PreferredSizeWidget {
   final String? currentCategory;
   final void Function(String)? onCategorySelected;
+  final String? searchQuery;
+  final void Function(String)? onSearchSubmitted;
+  final VoidCallback? onClearSearch;
 
   const NewsFeedNavBar({
     super.key,
     this.currentCategory,
     this.onCategorySelected,
+    this.searchQuery,
+    this.onSearchSubmitted,
+    this.onClearSearch,
   });
 
   @override
@@ -58,6 +64,64 @@ class NewsFeedNavBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
   final _categoryScrollCtrl = ScrollController();
+  final _searchController = TextEditingController();
+  bool _isMobileSearchOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.text = widget.searchQuery ?? '';
+  }
+
+  @override
+  void didUpdateWidget(NewsFeedNavBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchQuery != oldWidget.searchQuery) {
+      _searchController.text = widget.searchQuery ?? '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _categoryScrollCtrl.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _handleSearchSubmit(String query) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return;
+    setState(() {
+      _isMobileSearchOpen = false;
+    });
+    if (widget.onSearchSubmitted != null) {
+      widget.onSearchSubmitted!(trimmed);
+    } else {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => NewsFeedPage(initialSearchQuery: trimmed),
+        ),
+        (route) => false,
+      );
+    }
+  }
+
+  void _handleSearchClear() {
+    _searchController.clear();
+    setState(() {
+      _isMobileSearchOpen = false;
+    });
+    if (widget.onClearSearch != null) {
+      widget.onClearSearch!();
+    } else if (widget.searchQuery != null && widget.searchQuery!.isNotEmpty) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const NewsFeedPage()),
+        (route) => false,
+      );
+    }
+  }
 
   // Navigation helpers
   void _handleCategoryTap(BuildContext context, String category) {
@@ -133,6 +197,44 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
             isActive: isActive,
             onTap: () => _handleCategoryTap(context, cat),
           );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSearchInput({bool isMobile = false}) {
+    return Container(
+      height: 36,
+      constraints: BoxConstraints(maxWidth: isMobile ? double.infinity : 320),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E1E30),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onSubmitted: _handleSearchSubmit,
+        textAlignVertical: TextAlignVertical.center,
+        style: const TextStyle(color: Colors.white, fontSize: 13),
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          isDense: true,
+          hintText: 'Search articles...',
+          hintStyle: const TextStyle(color: _kTextMuted, fontSize: 13),
+          prefixIcon: const Icon(Icons.search_rounded, color: _kTextMuted, size: 18),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.close_rounded, color: _kTextMuted, size: 16),
+                  onPressed: _handleSearchClear,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+        ),
+        onChanged: (val) {
+          setState(() {});
         },
       ),
     );
@@ -334,6 +436,8 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
   Widget build(BuildContext context) {
     final activeCategory = widget.currentCategory ?? 'Home';
     final canPop = Navigator.of(context).canPop();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth <= 650;
 
     return AppBar(
       backgroundColor: _kNavBg,
@@ -341,67 +445,97 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
       toolbarHeight: 56,
       automaticallyImplyLeading: false,
 
-      title: Row(
-        children: [
-          // Back button
-          if (canPop) ...[
-            InkWell(
-              borderRadius: BorderRadius.circular(8),
-              onTap: () => Navigator.pop(context),
-              child: const Padding(
-                padding: EdgeInsets.all(6),
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white70,
-                  size: 18,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-          ],
-
-          // Logo + wordmark
-          InkWell(
-            borderRadius: BorderRadius.circular(6),
-            onTap: () => _handleCategoryTap(context, 'Home'),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+      title: isMobile && _isMobileSearchOpen
+          ? Row(
               children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: _kAccent,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'N',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                      ),
+                InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => setState(() => _isMobileSearchOpen = false),
+                  child: const Padding(
+                    padding: EdgeInsets.all(6),
+                    child: Icon(
+                      Icons.arrow_back_rounded,
+                      color: Colors.white70,
+                      size: 20,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'NewsFeed',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
+                Expanded(child: _buildSearchInput(isMobile: true)),
+              ],
+            )
+          : Row(
+              children: [
+                // Back button
+                if (canPop) ...[
+                  InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => Navigator.pop(context),
+                    child: const Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white70,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+
+                // Logo + wordmark
+                InkWell(
+                  borderRadius: BorderRadius.circular(6),
+                  onTap: () => _handleCategoryTap(context, 'Home'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: _kAccent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Center(
+                          child: Text(
+                            'N',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'NewsFeed',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+
+                if (!isMobile) ...[
+                  const SizedBox(width: 16),
+                  Expanded(child: _buildSearchInput(isMobile: false)),
+                ],
               ],
             ),
-          ),
-        ],
-      ),
 
       actions: [
+        if (isMobile && !_isMobileSearchOpen)
+          IconButton(
+            tooltip: 'Search articles',
+            icon: const Icon(Icons.search_rounded, color: Colors.white70, size: 22),
+            onPressed: () => setState(() => _isMobileSearchOpen = true),
+          ),
         // Country picker
         _buildCountryPicker(context),
         const SizedBox(width: 10),
@@ -416,12 +550,6 @@ class _NewsFeedNavBarState extends State<NewsFeedNavBar> {
         child: _buildCategoryStrip(activeCategory),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _categoryScrollCtrl.dispose();
-    super.dispose();
   }
 }
 
