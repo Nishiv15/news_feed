@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './screens/HomePage.dart';
 import './screens/NewsFeedPage.dart';
 import './models/news_model.dart';
+import './models/theme_notifier.dart';
 import './widgets/install_app_banner_stub.dart'
 if (dart.library.js_interop) './widgets/install_app_banner.dart';
 
@@ -11,6 +12,8 @@ const _supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await themeNotifier.init();
 
   await Supabase.initialize(
     url: _supabaseUrl,
@@ -60,16 +63,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'NewsFeed',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      builder: (context, child) {
-        return InstallAppBanner(child: child ?? const SizedBox.shrink());
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, themeMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'NewsFeed',
+          themeMode: themeMode,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            scaffoldBackgroundColor: const Color(0xFFF7F4EF),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFFD6472B),
+              brightness: Brightness.light,
+            ),
+          ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            scaffoldBackgroundColor: const Color(0xFF121218),
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFFD6472B),
+              brightness: Brightness.dark,
+              surface: const Color(0xFF1E1E2E),
+            ),
+          ),
+          builder: (context, child) {
+            return InstallAppBanner(child: child ?? const SizedBox.shrink());
+          },
+          home: startPage,
+        );
       },
-      home: startPage,
     );
   }
 }
+

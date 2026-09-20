@@ -14,6 +14,7 @@ class ArticleContentWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final combinedText = '${article.description} ${article.content}';
     final readTime = _estimateReadTime(combinedText);
 
@@ -41,7 +42,7 @@ class ArticleContentWidget extends StatelessWidget {
                 fontFamily: 'Georgia',
                 fontSize: isMobile ? 24 : 32,
                 fontWeight: FontWeight.w900,
-                color: const Color(0xFF1A1A2E),
+                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                 height: 1.25,
                 letterSpacing: -0.5,
               ),
@@ -57,24 +58,24 @@ class ArticleContentWidget extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A2E).withOpacity(0.06),
+                color: isDark ? Colors.white.withOpacity(0.1) : const Color(0xFF1A1A2E).withOpacity(0.06),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.timer_outlined,
                     size: 14,
-                    color: Color(0xFF1A1A2E),
+                    color: isDark ? Colors.white70 : const Color(0xFF1A1A2E),
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '$readTime min read',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E),
+                      color: isDark ? Colors.white70 : const Color(0xFF1A1A2E),
                     ),
                   ),
                 ],
@@ -90,7 +91,7 @@ class ArticleContentWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFFF0ECE6),
+              color: isDark ? const Color(0xFF252538) : const Color(0xFFF0ECE6),
               borderRadius: BorderRadius.circular(12),
               border: const Border(
                 left: BorderSide(
@@ -101,12 +102,12 @@ class ArticleContentWidget extends StatelessWidget {
             ),
             child: Text(
               article.description,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Georgia',
                 fontSize: 18,
                 fontStyle: FontStyle.italic,
                 height: 1.5,
-                color: Color(0xFF2C2C3E),
+                color: isDark ? const Color(0xFFE0E0E0) : const Color(0xFF2C2C3E),
               ),
             ),
           ),
@@ -117,10 +118,10 @@ class ArticleContentWidget extends StatelessWidget {
         if (cleanContent.isNotEmpty) ...[
           Text(
             cleanContent,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 17,
               height: 1.7,
-              color: Color(0xFF2D2D3F),
+              color: isDark ? const Color(0xFFDCDCE6) : const Color(0xFF2D2D3F),
               letterSpacing: 0.1,
             ),
           ),
@@ -133,7 +134,7 @@ class ArticleContentWidget extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF7ED),
+              color: isDark ? const Color(0xFF2D1E12) : const Color(0xFFFFF7ED),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: const Color(0xFFF97316).withOpacity(0.3),
@@ -150,8 +151,8 @@ class ArticleContentWidget extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Full story continues at publisher source ($charsRemainingNotice). Use the button below to read the complete article.',
-                    style: const TextStyle(
-                      color: Color(0xFF9A3412),
+                    style: TextStyle(
+                      color: isDark ? const Color(0xFFFFB74D) : const Color(0xFF9A3412),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       height: 1.4,

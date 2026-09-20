@@ -63,8 +63,10 @@ class _SavedArticlesPageState extends State<SavedArticlesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF121218) : Colors.white,
       appBar: const NewsFeedNavBar(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -77,25 +79,29 @@ class _SavedArticlesPageState extends State<SavedArticlesPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 8.0),
                             child: Text(
                               'My Saved Articles',
                               style: TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF1A1A2E),
+                                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                               ),
                             ),
                           ),
 
                           _savedArticles.isEmpty
-                              ? const Padding(
-                                  padding: EdgeInsets.all(40.0),
+                              ? Padding(
+                                  padding: const EdgeInsets.all(40.0),
                                   child: Center(
                                     child: Text(
-                                      "You haven't saved any articles yet! Click the heart icon on any article to save it securely here.",
-                                      style: TextStyle(fontSize: 18, color: Colors.blueGrey, fontWeight: FontWeight.w500),
+                                      "You haven't saved any articles yet! Click the bookmark icon on any article to save it securely here.",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: isDark ? Colors.blueGrey[200] : Colors.blueGrey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),

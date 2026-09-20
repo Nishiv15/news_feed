@@ -5,6 +5,7 @@ import '../models/gemini_service.dart';
 import '../screens/LoginRegisterPage.dart';
 
 void showAISummaryPanel(BuildContext context, NewsItem article) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   showGeneralDialog(
     context: context,
     barrierDismissible: true,
@@ -19,7 +20,7 @@ void showAISummaryPanel(BuildContext context, NewsItem article) {
           child: Container(
             width: MediaQuery.of(context).size.width > 400 ? 350 : MediaQuery.of(context).size.width * 0.85,
             height: double.infinity,
-            color: Colors.white,
+            color: isDark ? const Color(0xFF1E1E2E) : Colors.white,
             child: AISummaryContentView(article: article),
           ),
         ),
@@ -77,6 +78,7 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,16 +123,16 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                     style: TextStyle(
                       fontSize: 16, 
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey[600],
+                      color: isDark ? Colors.grey[400] : Colors.grey[600],
                     ),
                   ),
-                  const Divider(height: 30),
-                  const Text(
+                  Divider(height: 30, color: isDark ? const Color(0xFF2C2C3E) : Colors.grey[300]),
+                  Text(
                     'Brief Overview',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A1A2E),
+                      color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -139,7 +141,7 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                     style: TextStyle(
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
-                      color: Colors.black.withOpacity(0.4),
+                      color: isDark ? Colors.white54 : Colors.black.withOpacity(0.4),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -150,17 +152,21 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                         padding: const EdgeInsets.symmetric(vertical: 24.0),
                         child: Column(
                           children: [
-                            const Icon(Icons.lock_outline, size: 48, color: Colors.grey),
+                            Icon(Icons.lock_outline, size: 48, color: isDark ? Colors.grey[400] : Colors.grey),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'Authentication Required',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : Colors.black,
+                              ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'Log in or register a free account to unlock AI-powered article summaries!',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey, height: 1.5),
+                              style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, height: 1.5),
                             ),
                             const SizedBox(height: 24),
                             ElevatedButton(
@@ -183,14 +189,17 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                       ),
                     )
                   else if (_isLoading)
-                    const Center(
+                    Center(
                       child: Padding(
-                        padding: EdgeInsets.all(32.0),
+                        padding: const EdgeInsets.all(32.0),
                         child: Column(
                           children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text('Analyzing article data...'),
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Analyzing article data...',
+                              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                            ),
                           ],
                         ),
                       ),
@@ -198,10 +207,10 @@ class _AISummaryContentViewState extends State<AISummaryContentView> {
                   else
                     Text(
                       _summary ?? 'No summary available.',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         height: 1.6,
-                        color: Colors.black87,
+                        color: isDark ? const Color(0xFFE0E0E0) : Colors.black87,
                       ),
                     ),
                 ],
